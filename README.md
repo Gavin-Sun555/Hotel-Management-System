@@ -4,7 +4,7 @@
  This is my first C course project of the course VE101 as freshman student in Shanghai Jiao Tong University. It is a course designed for new engineers to design simple algorithms and understand the main concepts of programming. To be honest, the code style of this project is terrible and there are countless bugs and memory leak in this project. It is posted to record my start point of my coding career. Future modification may be made. Following is the original readme written at that time. I transfer the original txt file into markdown to make it easier to read.
  
  
-## BASIC INFORMATION:
+## Basic Information
 1.	Firstly, with the function "Initialdata", I renew the data in the database. In the current version, the size of the hotel is fixed and cannot be changed by users.
 1.	Then, I generate visitors of checkin with random number and link list in the function "generatevistors". I use pointer to the structure to generate random names stored in my structure set.
 1.	Then with checkin and checkout function, visitors are able to check out. For most of time, the check out function works fairly well. But sometimes it may have some problems. You may restart
@@ -24,11 +24,14 @@ the program or try more times. If there are still problems, please contact with 
 1.	Of course the remain parts of functions should be completed.
 1.	I have downloaded the QT and have a basic check of how to build a GUI. I will try to do so in the next version.
 
-## OTHER THINGS
+## Other Things
 1.	Firstly, I thought to read the information of the room with link list.  Like the following structure. However, I think it may be easier and efficient to direct deal with the data base.
-double Room link list only->room(int)->vacant(int)->name1(string?)->id1(string)->name2(string?)->id2(string?)->arrival(string?)->key(int)->breakfast(int)->nights(int)->price(int)(price is breakfast*15,key*1,nights*80with random change)
-single Room link list only->room(int)->-vacant(int)->name(string?)->id(string)->arrival(string?)->key(int)->breakfast(int)->nights(int)->price(int)(price is breakfast*15,key*1,nights*60with random change)
-Famile Room link list only->room(int)->-vacant(int)->name1(string?)->id1(string)->name2(string?)->id2(string?)->name3(string?)->id3(string?)->arrival(string?)->key(int)->breakfast(int)->nights(int)->price(int)(price is breakfast*15,key*1,nights*100with random change)
-Dorm Room link list only->room(int)->-vacant(int)->deduce how many visitors and link to visitors
+1. Double Room link list only->room(int)->vacant(int)->name1(string)->id1(string)->name2(string)->id2(string)->arrival(string)->key(int)->breakfast(int)->nights(int)->price(int)(price is breakfast\*15,key\*1,nights\*80 with random change)
+1. Single Room link list only->room(int)->-vacant(int)->name(string)->id(string)->arrival(string)->key(int)->breakfast(int)->nights(int)->price(int)(price is breakfast\*15,key\*1,nights\*60 with random change)
+1. Famile Room link list only->room(int)->-vacant(int)->name1(string)->id1(string)->name2(string)->id2(string)->name3(string)->id3(string)->arrival(string)->key(int)->breakfast(int)->nights(int)->price(int)(price is breakfast\*15,key\*1,nights\*100 with random change)
+1. Dorm Room link list only->room(int)->-vacant(int)->deduce how many visitors and link to visitors
 The structure of link list of randomly generated visitors are listed as following:
-check-invistors>number(0-3(3means dorm alone))>name(string?)->id(string)(2/3times for single room/double room)->key(int)->breakfast(int)->nights(int)//->price(int)(breakfast*15+key*1+nights*20)
+check-invistors>number(0-3) (3means dorm alone))>name(string)->id(string)(2/3times for single room/double room)->key(int)->breakfast(int)->nights(int)//->price(int)(breakfast\*15+key\*1+nights\*20)
+
+## Contact
+If you have any adivices or feedbacks, please email to yansu@umich.edu with \[ github_feedback \]. I will reply emails within two bussiness days.
