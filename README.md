@@ -3,6 +3,24 @@
 ## About
 This is my first C course project of the course VE101 as a freshman student at [University of Michigan-Shanghai Jiao Tong University Joint Institute](http://umji.sjtu.edu.cn/). It is a course designed for new engineers to design simple algorithms and understand the main concepts of programming. To be honest, the code style of this project is not good and there are countless bugs and perhaps some memory leaks in this project. It is posted to record the starting point of my coding career. Future modifications may be made. Following is the original readme wrote at that time. I transfer the original txt file into markdown to make it easier to read. There are many redundent descrptions, which I will fix later.
  
+## Compiling and Quick Start
+### Compile on Linux and OS X
+The software uses CMake to compile itself.
+To compile using CMake, you can enter the following shell command:
+```commandline
+mkdir build
+cd build
+cmake ..
+make
+```
+
+Alternatively, you can use the following building command:
+```commandline
+gcc -Wall -pedantic -Werror -Wno-unused-result -DNDEBUG -std=c11 -o hotel hotel-main.c hotel-mt.c hotel-db.c hotel-ll.c -lm
+```
+
+### Compile on Windows
+On Microsoft Windows we recommend you to use Clion with mingw64 toolchain to open the project and compile it. 
  
 ## Basic Information
 1.	Firstly, with the function "Initialdata", I renew the data in the database. In the current version, the size of the hotel is fixed and cannot be changed by users.
