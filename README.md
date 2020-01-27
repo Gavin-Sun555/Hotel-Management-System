@@ -1,7 +1,7 @@
 # Hotel Management System Beta 0.0.1 (2018-07-18)  
 
 ## About
- This is my first C course project of the course VE101 as freshman student in Shanghai Jiao Tong University. It is a course designed for new engineers to design simple algorithms and understand the main concepts of programming. To be honest, the code style of this project is terrible and there are countless bugs and memory leak in this project. It is posted to record my start point of my coding career. Future modification may be made. Following is the original readme written at that time. I transfer the original txt file into markdown to make it easier to read.
+ This is my first C course project of the course VE101 as a freshman student in Shanghai Jiao Tong University. It is a course designed for new engineers to design simple algorithms and understand the main concepts of programming. To be honest, the code style of this project is not good and there are countless bugs and perhaps some memory leaks in this project. It is posted to record my start point of my coding career. Future modification may be made. Following is the original readme written at that time. I transfer the original txt file into markdown to make it easier to read.
  
  
 ## Basic Information
@@ -33,5 +33,5 @@ the program or try more times. If there are still problems, please contact with 
 The structure of link list of randomly generated visitors are listed as following:
 check-invistors>number(0-3) (3means dorm alone))>name(string)->id(string)(2/3times for single room/double room)->key(int)->breakfast(int)->nights(int)//->price(int)(breakfast\*15+key\*1+nights\*20)
 
-## Contact
-If you have any adivices or feedbacks, please email to yansu@umich.edu with \[ github_feedback \]. I will reply emails within two bussiness days.
+## Contact and Copywrite
+If you have any adivices or feedbacks, please email to yansu@umich.edu with \[ github_feedback \]. I will reply emails within two bussiness days. Since it is a open course project written on my own, there is no copywrites restriction on use or modify the code.
