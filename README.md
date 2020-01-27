@@ -22,7 +22,7 @@ the program or try more times. If there are still problems, please contact with 
 2. Of course the remain parts of functions should be completed.
 3.I have downloaded the QT and have a basic check of how to build a GUI. I will try to do so in the next version.
 
-OTHER THINGS£º
+OTHER THINGSÂ£Âº
 1.Firstly, I thought to read the information of the room with link list.  Like the following structure. However, I think it may be easier and efficient to direct deal with the data base.
 double Room link list only->room(int)->vacant(int)->name1(string?)->id1(string)->name2(string?)->id2(string?)->arrival(string?)->key(int)->breakfast(int)->nights(int)->price(int)(price is breakfast*15,key*1,nights*80with random change)
 single Room link list only->room(int)->-vacant(int)->name(string?)->id(string)->arrival(string?)->key(int)->breakfast(int)->nights(int)->price(int)(price is breakfast*15,key*1,nights*60with random change)
