@@ -18,9 +18,10 @@ Alternatively, you can use the following building command:
 ```commandline
 gcc -Wall -pedantic -Werror -Wno-unused-result -DNDEBUG -std=c11 -o hotel hotel-main.c hotel-mt.c hotel-db.c hotel-ll.c -lm
 ```
+If you use IDE like Jetbrain Clion, it can complie with a single click.
 
 ### Compile on Windows
-On Microsoft Windows we recommend you to use Clion with mingw64 toolchain to open the project and compile it. 
+On Microsoft Windows we recommend you to use mingw64 toolchain to compile it. Jetbrain Clion or VS Code is recommanded.
  
 ## Basic Information
 1.	Firstly, with the function "Initialdata", I renew the data in the database. In the current version, the size of the hotel is fixed and cannot be changed by users.
