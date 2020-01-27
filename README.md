@@ -19,12 +19,12 @@ the program or try more times. If there are still problems, please contact with 
 1.	Though I actually did not write this piece of project well, I still learnt a lot during the process. I learnt to handle the pointer better and have a deep understanding towards it. I also practice the usage of the structure. Moreover, after failing to deal with time with <time.h>,which is absolutely possible, I choose to use my own function to do the job of adding day. Though it seems unnecessary, but it works fairly well.
 1.	More information are written in the program.
 
-## 
+## Future Improvement
 1.	Since my wrong choice of method, some parts of program becomes very terrible. Hence, if haven more time, I will definitely change a method for this management system in the future version.
 1.	Of course the remain parts of functions should be completed.
 1.	I have downloaded the QT and have a basic check of how to build a GUI. I will try to do so in the next version.
 
-OTHER THINGS£º
+## OTHER THINGS
 1.	Firstly, I thought to read the information of the room with link list.  Like the following structure. However, I think it may be easier and efficient to direct deal with the data base.
 double Room link list only->room(int)->vacant(int)->name1(string?)->id1(string)->name2(string?)->id2(string?)->arrival(string?)->key(int)->breakfast(int)->nights(int)->price(int)(price is breakfast*15,key*1,nights*80with random change)
 single Room link list only->room(int)->-vacant(int)->name(string?)->id(string)->arrival(string?)->key(int)->breakfast(int)->nights(int)->price(int)(price is breakfast*15,key*1,nights*60with random change)
