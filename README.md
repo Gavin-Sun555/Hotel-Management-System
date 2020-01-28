@@ -1,7 +1,7 @@
 # Hotel Management System Beta 0.0.1 (2018-07-18)  
 
 ## About
-This is my first C course project of the course VE101 as a freshman student at [University of Michigan-Shanghai Jiao Tong University Joint Institute](http://umji.sjtu.edu.cn/). It is a course designed for new engineers to design simple algorithms and understand the main concepts of programming. To be honest, the code style of this project is not good and there are countless bugs and perhaps some memory leaks in this project. It is posted to record the starting point of my coding career. Future modifications may be made. Following is the original readme wrote at that time. I transfer the original txt file into markdown to make it easier to read. There are many redundent descrptions, which I will fix later.
+This is my first C project as a freshman student at [University of Michigan-Shanghai Jiao Tong University Joint Institute](http://umji.sjtu.edu.cn/). To be honest, the code style of this project is not good and there are countless bugs and perhaps some memory leaks in this project. It is posted to record the starting point of my coding career. Future modifications may be made. Following is the original readme wrote at that time. I transfer the original txt file into markdown to make it easier to read. There are many redundent descrptions, which I will fix later.
  
 ## Compiling and Quick Start
 ### Compile on Linux and OS X
@@ -43,14 +43,5 @@ the program or try more times. If there are still problems, please contact with 
 1.	Of course, the remain parts of functions should be completed.
 1.	I have downloaded the QT and have a basic check on how to build a GUI. I will try to do so in the next version.
 
-## Other Things
-1.	Firstly, I thought to read the information of the room with link list.  Like the following structure. However, I think it may be easier and efficient to direct deal with the data base.
-1. Double Room link list only->room(int)->vacant(int)->name1(string)->id1(string)->name2(string)->id2(string)->arrival(string)->key(int)->breakfast(int)->nights(int)->price(int)(price is breakfast\*15,key\*1,nights\*80 with random change)
-1. Single Room link list only->room(int)->-vacant(int)->name(string)->id(string)->arrival(string)->key(int)->breakfast(int)->nights(int)->price(int)(price is breakfast\*15,key\*1,nights\*60 with random change)
-1. Famile Room link list only->room(int)->-vacant(int)->name1(string)->id1(string)->name2(string)->id2(string)->name3(string)->id3(string)->arrival(string)->key(int)->breakfast(int)->nights(int)->price(int)(price is breakfast\*15,key\*1,nights\*100 with random change)
-1. Dorm Room link list only->room(int)->-vacant(int)->deduce how many visitors and link to visitors
-The structure of link list of randomly generated visitors are listed as following:
-check-invistors>number(0-3) (3means dorm alone))>name(string)->id(string)(2/3times for single room/double room)->key(int)->breakfast(int)->nights(int)//->price(int)(breakfast\*15+key\*1+nights\*20)
-
 ## Contact and Copywrite
-If you have any adivices or feedbacks, please email to <yansu@umich.edu> with \[ github_feedback \]. I will reply emails within two bussiness days. Since it is a open course project written on my own, there is no copywrites restriction on use or modify the code.
+If you have any adivices or feedbacks, please email to <yansu@umich.edu> with \[ github_feedback \]. I will reply emails within two bussiness days. 
