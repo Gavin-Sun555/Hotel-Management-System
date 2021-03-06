@@ -25,7 +25,7 @@ On Microsoft Windows we recommend you to use mingw64 toolchain to compile it. Je
  
 ## Basic Information
 1.	Firstly, with the function "Initialdata", I renew the data in the database. In the current version, the size of the hotel is fixed and cannot be changed by users.
-1.	Then, I generate check-in vistors with random number and link list in the function "generatevistors". I use pointers to the structure to generate random names stored in my structure set.
+1.	Then, I generate check-in vistors with random number and link list in the function "generateVistors". I use pointers to the structure to generate random names stored in my structure set.
 1.	Then with check-in and check-out function, visitors are able to check out. For most of time, the check out function works fairly well. But sometimes it may have some problems due to possible memory leak. You may restart
 the program or try more times. If there are still problems, please contact with me. 
 1.	The users are able to set the date and the span of dates. And we can change the number of breakfasts and nights(not for dorm visitors yet). Just do the operation according to the command line.
