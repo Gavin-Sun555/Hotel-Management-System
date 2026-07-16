@@ -1,1 +1,4 @@
 cmake-build-debug/
+build/
+rates.cfg
+hotel.db

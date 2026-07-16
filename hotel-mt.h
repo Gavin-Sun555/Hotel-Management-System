@@ -7,7 +7,7 @@
 
 #include "hotel-ll.h"
 
-int initialMt(void); // Initialize the database for the hotel. Returns -1 on fail, 0 on success.
+int initializeDatabase(int numSingle, int numDouble, int numFamily, int numDorm); // Initialize the database for the hotel. Returns -1 on fail, 0 on success.
 
 // Checkin part
 void checkin(node_t *a, char *time1);

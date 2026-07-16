@@ -1,4 +1,4 @@
-# Hotel Management System Beta 0.0.1 (2018-07-18)
+# Hotel Management System Beta 0.0.2 (2026-07-16)
 
 ## About
 
@@ -6,17 +6,16 @@ This is my first C project as a freshman student at [University of Michigan-Shan
 
 ## Compiling and Quick Start
 
-### Compile on Linux and macOS
 
 The project uses CMake, and we have provided a `Makefile` wrapper to make compiling, running, and cleaning as simple as possible.
 
-#### Option 1: Using the Makefile (Recommended / Easiest)
+### Option 1: Using the Makefile (Recommended / Easiest)
 You can build, run, or clean the project with these commands:
 * **Build**: `make`
 * **Run**: `make run`
 * **Clean**: `make clean`
 
-#### Option 2: Using Modern CMake Commands
+### Option 2: Using Modern CMake Commands
 If you prefer to run CMake directly without using `make`:
 ```bash
 # Configure and build the project
@@ -27,7 +26,7 @@ cmake --build build
 ./build/Hotel-Management-System
 ```
 
-#### Option 3: Manual Compilation with GCC
+### Option 3: Manual Compilation with GCC
 You can also compile it in a single command using GCC:
 ```bash
 gcc -Wall -pedantic -Werror -Wno-unused-result -DNDEBUG -std=c11 -o hotel hotel-main.c hotel-mt.c hotel-db.c hotel-ll.c -lm
@@ -35,32 +34,39 @@ gcc -Wall -pedantic -Werror -Wno-unused-result -DNDEBUG -std=c11 -o hotel hotel-
 
 If you use an IDE like JetBrains CLion or VS Code, it can configure and compile with a single click.
 
-### Compile on Windows
 
-On Windows, we recommend using the MinGW-w64 toolchain to compile it. JetBrains CLion or VS Code with the CMake tools extension is recommended.
+## User Guide
 
+### 1. System Initialization
+Upon starting the program, it automatically initializes a fixed-size hotel database (`hotel.db`) containing single, double, family, and dorm rooms. Wait for the `SYSTEM INITIALIZED SUCCESSFULLY` message before proceeding.
 
-## Basic Information
+### 2. Daily Operations
+The program operates as a real-time interactive management system. It automatically pulls the system's real date, which is displayed on the main menu.
+- **Check-outs:** At the start of the program, the system will automatically parse the database and check-out any visitors whose scheduled departure date has arrived today. You can manually re-trigger check-outs for the current day from the menu.
+- **Check-ins:** You can manually check in guests by selecting the Check-In option on the menu. The system will prompt you for room type, guest names, IDs, deposits, and nights, before printing a beautiful check-in card and updating the database.
 
-1. Firstly, with the function `initialMt`, I initialize the data in the database. In the current version, the size of the hotel is fixed and cannot be changed by users.
-2. Then, I generate check-in visitors with random numbers and linked lists in the function `generateVisitors`. I use pointers to the structure to generate random names stored in my structure set.
-3. Then with the check-in and check-out functions, visitors are able to check out. For most of the time, the check-out function works fairly well. But sometimes it may have some problems due to possible memory leaks. You may restart the program or try again. If there are still problems, please contact me.
-4. The users are able to set the date and the span of dates. We can change the number of breakfasts and nights (not for dorm visitors yet). Just follow the prompts in the command line.
-5. In this version, many basic functions are still not completed.
-6. Though most parts of my program are lengthy — instead of using linked lists to read the data of every room, I chose to read and revise them directly. This causes my program to be extremely long. To make it more readable, comments are added for most parts. But there is no need to read them if the program runs fairly well.
-7. With my functions `timeToNumber` and `numberToTime`, I am able to compare dates. This function accounts for leap years. Because I count the year from 0, the result number is fairly large. It could be changed to take 1970 as the start year, but some people may find it fun if more ancient years are supported.
-8. The initial room prices are: Single $60, Double $80, Family $100, Breakfast $15.
-9. The check-out used to work well before I rearranged them in the required order. But now it has various issues from time to time. I have spent plenty of time but cannot figure out where the issues are. It would be greatly appreciated if you find the mistakes.
-10. Up to what I've tested, the check-in card and the receipt work fairly well.
-11. Though I actually did not write this project well, I still learned a lot during the process. I learned to handle pointers better and gained a deep understanding of them. I also practiced the usage of structures. Moreover, after failing to deal with time using `<time.h>` (which is absolutely possible), I chose to use my own function to do the job of adding a day. Though it seems unnecessary, it works fairly well.
-12. More information is written in comments in the program.
+### 3. Managing Reservations
+At any time from the main menu, you can modify the reservations of current guests (including dorm visitors):
+- **Modify Reservation:** Choose option `3` from the main menu.
+- **Enter Details:** You must provide the `Room Number` and the visitor's `ID` exactly as printed on their check-in card.
+- **Update:** Enter the new total number of breakfasts and the new total number of nights. The system will automatically recalculate their total price.
 
-## Future Improvement
+### 4. Pricing Information
+By default, the standard room rates are:
+- **Single Room:** $60/night
+- **Double Room:** $80/night
+- **Family Room:** $100/night
+- **Dorm Room:** $20/night per person
+- **Breakfast Add-on:** $15/breakfast
 
-1. Since my choice of method made some parts of the program terrible, I will definitely change the approach for this management system in a future version.
-2. Of course, the remaining functions should be completed.
-3. I have downloaded Qt and have a basic understanding of how to build a GUI. I will try to do so in the next version.
+These rates are fully customizable directly from the main menu by selecting Option `4. Adjust Room Rates`. The system stores customized rates in `rates.cfg`, ensuring they persist across program restarts.
 
-## Contact and Copyright
+### 5. Reporting and Searching
+The main menu includes powerful reporting options to view real-time operations:
+- **View Available Rooms (5):** Lists every unoccupied room (and available dorm beds) instantly.
+- **View Checked-In Guests (6):** Lists all current occupants across the entire hotel.
+- **Lookup Guest or Room (7):** Enter a name, ID, or room number to retrieve that reservation's complete details.
 
-If you have any advice or feedback, please email <yansu@umich.edu> with \[ github\_feedback \]. I will reply to emails within two business days.
+### 6. Database and Initialization
+The system's database (`hotel.db`) persists automatically. If the file is deleted, or if you select Option `8. Factory Reset Database` from the main menu, the program will prompt you to enter the number of Single, Double, Family, and Dorm rooms you wish to construct, allowing you to dynamically adjust the total size of your hotel at any time.
+

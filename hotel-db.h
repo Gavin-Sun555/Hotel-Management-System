@@ -11,11 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void checkinSingleRoom(char *number, node_t *guest, char *time);
-
-void checkinDoubleRoom(char *number, node_t *guest, char *time);
-
-void checkinFamilyRoom(char *number, node_t *guest, char *time);
+void checkinPrivateRoom(char *number, node_t *guest, char *time, int type);
 
 void checkinDorm(char *number, node_t *guest, char *time);
 
@@ -25,7 +21,7 @@ long long int timeToNumber(char *time1);
 
 char *numberToTime(long long int time1);
 
-void checkDorm(char number, char *roomNum, int time1);
+int checkDorm(char number, char *roomNum, int time1);
 
 void checkoutCards(char *name, char *id, char *arrival, int room, int nights, int price, int breakfast);
 
@@ -36,3 +32,7 @@ void checkoutCards(char *name, char *id, char *arrival, int room, int nights, in
 int changeBreakfastNights(char *number, char *id, int breakChange, int nightsChange);
 
 #endif //PROJECT_2_HOTEL_DB_H
+
+void listAvailableRooms(void);
+void listCheckedInGuests(void);
+void searchDatabase(char *query);

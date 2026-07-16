@@ -1,126 +1,72 @@
 #include "hotel-ll.h"
+#include "hotel-config.h"
 #include "hotel-db.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-void checkinSingleRoom(char *number, node_t *guest, char *time) {
+void checkinPrivateRoom(char *number, node_t *guest, char *time, int type) {
     char str[10000];
+    long i = 0;
     int key, breakfast, nights;
     FILE *fp = fopen("hotel.db", "r");
     if (!fp) {
         printf("ERROR IN POS50");
     }
-    long i = 0;
     while (feof(fp) == 0) {
         str[i] = fgetc(fp);
         i++;
     }
-    char *pos = strstr(str, number);//rewrite this part, finally print.
+    char *pos = strstr(str, number);
     fclose(fp);
+    
     FILE *fp1 = fopen("hotel.db", "w");
     for (i = 0; i < (pos - str + 6); i++)
-        fprintf(fp1, "%c", str[i]);//copy the part before
-    fprintf(fp1, "type=single\n");
-    fprintf(fp1, "vacant=0\n");
-    fprintf(fp1, "name=%s\n", (char *) guest->next->ch);
-    fprintf(fp1, "id=%s\n", (char *) guest->next->next->ch);
+        fprintf(fp1, "%c", str[i]);
+        
+    if (type == 0) {
+        fprintf(fp1, "type=single\n");
+        fprintf(fp1, "vacant=0\n");
+        fprintf(fp1, "name=%s\n", (char *) guest->next->ch);
+        fprintf(fp1, "id=%s\n", (char *) guest->next->next->ch);
+        guest = guest->next->next;
+    } else if (type == 1) {
+        fprintf(fp1, "type=double\n");
+        fprintf(fp1, "vacant=0\n");
+        fprintf(fp1, "name1=%s\n", (char *) guest->next->ch);
+        fprintf(fp1, "id1=%s\n", (char *) guest->next->next->ch);
+        fprintf(fp1, "name2=%s\n", (char *) guest->next->next->next->ch);
+        fprintf(fp1, "id2=%s\n", (char *) guest->next->next->next->next->ch);
+        guest = guest->next->next->next->next;
+    } else if (type == 2) {
+        fprintf(fp1, "type=family\n");
+        fprintf(fp1, "vacant=0\n");
+        fprintf(fp1, "name1=%s\n", (char *) guest->next->ch);
+        fprintf(fp1, "id1=%s\n", (char *) guest->next->next->ch);
+        fprintf(fp1, "name2=%s\n", (char *) guest->next->next->next->ch);
+        fprintf(fp1, "id2=%s\n", (char *) guest->next->next->next->next->ch);
+        fprintf(fp1, "name3=%s\n", (char *) guest->next->next->next->next->next->ch);
+        fprintf(fp1, "id3=%s\n", (char *) guest->next->next->next->next->next->next->ch);
+        guest = guest->next->next->next->next->next->next;
+    }
+    
     fprintf(fp1, "arrival=%s\n", time);
-    key = *(int *) guest->next->next->next->ch;
+    key = *(int *) guest->next->ch;
     fprintf(fp1, "key=%d\n", key);
-    breakfast = *(int *) guest->next->next->next->next->ch;
+    breakfast = *(int *) guest->next->next->ch;
     fprintf(fp1, "breakfast=%d\n", breakfast);
-    nights = *(int *) guest->next->next->next->next->next->ch;
+    nights = *(int *) guest->next->next->next->ch;
     fprintf(fp1, "nights=%d\n", nights);
-    fprintf(fp1, "price=%d\n\n", nights * 60 + breakfast * 15);
+    
+    int rate = (type == 0) ? current_rates.single_rate : ((type == 1) ? current_rates.double_rate : current_rates.family_rate);
+    fprintf(fp1, "price=%d\n\n", nights * rate + breakfast * current_rates.breakfast_rate);
+    
     pos = strstr(pos + 1, "[");
     i = (pos - str);
     while (str[i - 1] != '-') {
         fprintf(fp1, "%c", str[i]);
         i++;
-    }//copy the part after
-    fclose(fp1);
-}
-
-void checkinDoubleRoom(char *number, node_t *guest, char *time) {
-    char str[10000];
-    int key, breakfast, nights;
-    FILE *fp = fopen("hotel.db", "r");
-    if (!fp) {
-        printf("ERROR IN POS50");
     }
-    long i = 0;
-    while (feof(fp) == 0) {//not reach the end//
-        str[i] = fgetc(fp);
-        i++;
-    }
-    char *pos = strstr(str, number);//rewrite this part, finally print.
-    fclose(fp);
-    FILE *fp1 = fopen("hotel.db", "w");
-    for (i = 0; i < (pos - str + 6); i++)
-        fprintf(fp1, "%c", str[i]);//copy the part before
-    fprintf(fp1, "type=double\n");
-    fprintf(fp1, "vacant=0\n");
-    fprintf(fp1, "name1=%s\n", (char *) guest->next->ch);
-    fprintf(fp1, "id1=%s\n", (char *) guest->next->next->ch);
-    fprintf(fp1, "name2=%s\n", (char *) guest->next->next->next->ch);
-    fprintf(fp1, "id2=%s\n", (char *) guest->next->next->next->next->ch);
-    fprintf(fp1, "arrival=%s\n", time);
-    key = *(int *) guest->next->next->next->next->next->ch;
-    fprintf(fp1, "key=%d\n", key);
-    breakfast = *(int *) guest->next->next->next->next->next->next->ch;
-    fprintf(fp1, "breakfast=%d\n", breakfast);
-    nights = *(int *) guest->next->next->next->next->next->next->next->ch;
-    fprintf(fp1, "nights=%d\n", nights);
-    fprintf(fp1, "price=%d\n\n", nights * 80 + breakfast * 15);
-    pos = strstr(pos + 1, "[");
-    i = (pos - str);
-    while (str[i - 1] != '-') {
-        fprintf(fp1, "%c", str[i]);
-        i++;
-    }//copy the part after
-    fclose(fp1);
-}
-
-void checkinFamilyRoom(char *number, node_t *guest, char *time) {
-    char str[10000];
-    long i = 0;
-    int key, breakfast, nights;
-    FILE *fp = fopen("hotel.db", "r");
-    if (!fp) {
-        printf("ERROR IN POS50");
-    }
-    while (feof(fp) == 0) {//not reach the end//
-        str[i] = fgetc(fp);
-        i++;
-    }
-    char *pos = strstr(str, number);//rewrite this part, finally print.
-    fclose(fp);
-    FILE *fp1 = fopen("hotel.db", "w");
-    for (i = 0; i < (pos - str + 6); i++)
-        fprintf(fp1, "%c", str[i]);//copy the part before
-    fprintf(fp1, "type=family\n");
-    fprintf(fp1, "vacant=0\n");
-    fprintf(fp1, "name1=%s\n", (char *) guest->next->ch);
-    fprintf(fp1, "id1=%s\n", (char *) guest->next->next->ch);
-    fprintf(fp1, "name2=%s\n", (char *) guest->next->next->next->ch);
-    fprintf(fp1, "id2=%s\n", (char *) guest->next->next->next->next->ch);
-    fprintf(fp1, "name3=%s\n", (char *) guest->next->next->next->next->next->ch);
-    fprintf(fp1, "id3=%s\n", (char *) guest->next->next->next->next->next->next->ch);
-    fprintf(fp1, "arrival=%s\n", time);
-    key = *(int *) guest->next->next->next->next->next->next->next->ch;
-    fprintf(fp1, "key=%d\n", key);
-    breakfast = *(int *) guest->next->next->next->next->next->next->next->next->ch;
-    fprintf(fp1, "breakfast=%d\n", breakfast);
-    nights = *(int *) guest->next->next->next->next->next->next->next->next->next->ch;
-    fprintf(fp1, "nights=%d\n", nights);
-    fprintf(fp1, "price=%d\n\n", nights * 100 + breakfast * 15);
-    pos = strstr(pos + 1, "[");
-    i = (pos - str);
-    while (str[i - 1] != '-') {
-        fprintf(fp1, "%c", str[i]);
-        i++;
-    }//copy the part after
     fclose(fp1);
 }
 
@@ -140,13 +86,24 @@ void checkinDorm(char *number, node_t *guest, char *time) {
     fclose(fp);
     char *pos2 = strstr(pos, "vacant");
     char *pos3 = strstr(pos2, "[");
-    if (*(pos2 + 7) == '1') {//only one bed left
-        str[pos2 - str + 7] = '0';
-        str[pos2 - str + 17] = '6';
+    char vacant_char = *(pos2 + 7);
+    if (vacant_char >= '1' && vacant_char <= '6') {
+        int vacant = vacant_char - '0';
+        int new_vacant = vacant - 1;
+        int new_visitors = 6 - new_vacant;
+        
+        str[pos2 - str + 7] = new_vacant + '0';
+        str[pos2 - str + 17] = new_visitors + '0';
+        
         FILE *fp1 = fopen("hotel.db", "w");
         for (i = 0; i < (pos3 - str); i++)
             fprintf(fp1, "%c", str[i]);//copy the part before
-        fprintf(fp1, "name=%s\n", (char *) guest->next->ch);
+            
+        if (vacant_char == '6') {
+            fprintf(fp1, "\nname=%s\n", (char *) guest->next->ch);
+        } else {
+            fprintf(fp1, "name=%s\n", (char *) guest->next->ch);
+        }
         fprintf(fp1, "id=%s\n", (char *) guest->next->next->ch);
         fprintf(fp1, "arrival=%s\n", time);
         key = *(int *) guest->next->next->next->ch;
@@ -155,126 +112,14 @@ void checkinDorm(char *number, node_t *guest, char *time) {
         fprintf(fp1, "breakfast=%d\n", breakfast);
         nights = *(int *) guest->next->next->next->next->next->ch;
         fprintf(fp1, "nights=%d\n", nights);
-        fprintf(fp1, "price=%d\n\n", nights * 20 + breakfast * 15);
+        fprintf(fp1, "price=%d\n\n", nights * current_rates.dorm_rate + breakfast * current_rates.breakfast_rate);
         i = pos3 - str;
         while (str[i - 1] != '-') {
             fprintf(fp1, "%c", str[i]);
             i++;
         }
         fclose(fp1);
-    }//copy the part after
-    else if (*(pos2 + 7) == '2') {//only two bed left
-        str[pos2 - str + 7] = '1';
-        str[pos2 - str + 17] = '5';
-        FILE *fp1 = fopen("hotel.db", "w");
-        for (i = 0; i < (pos3 - str); i++)
-            fprintf(fp1, "%c", str[i]);//copy the part before
-        fprintf(fp1, "name=%s\n", (char *) guest->next->ch);
-        fprintf(fp1, "id=%s\n", (char *) guest->next->next->ch);
-        fprintf(fp1, "arrival=%s\n", time);
-        key = *(int *) guest->next->next->next->ch;
-        fprintf(fp1, "key=%d\n", key);
-        breakfast = *(int *) guest->next->next->next->next->ch;
-        fprintf(fp1, "breakfast=%d\n", breakfast);
-        nights = *(int *) guest->next->next->next->next->next->ch;
-        fprintf(fp1, "nights=%d\n", nights);
-        fprintf(fp1, "price=%d\n\n", nights * 20 + breakfast * 15 + key);
-        i = pos3 - str;
-        while (str[i - 1] != '-') {
-            fprintf(fp1, "%c", str[i]);
-            i++;//copy the part after revising;
-        }
-        fclose(fp1);
-    } else if (*(pos2 + 7) == '3') {//only two bed left
-        str[pos2 - str + 7] = '2';
-        str[pos2 - str + 17] = '4';
-        FILE *fp1 = fopen("hotel.db", "w");
-        for (i = 0; i < (pos3 - str); i++)
-            fprintf(fp1, "%c", str[i]);//copy the part before
-        fprintf(fp1, "name=%s\n", (char *) guest->next->ch);
-        fprintf(fp1, "id=%s\n", (char *) guest->next->next->ch);
-        fprintf(fp1, "arrival=%s\n", time);
-        key = *(int *) guest->next->next->next->ch;
-        fprintf(fp1, "key=%d\n", key);
-        breakfast = *(int *) guest->next->next->next->next->ch;
-        fprintf(fp1, "breakfast=%d\n", breakfast);
-        nights = *(int *) guest->next->next->next->next->next->ch;
-        fprintf(fp1, "nights=%d\n", nights);
-        fprintf(fp1, "price=%d\n\n", nights * 20 + breakfast * 15);
-        i = pos3 - str;
-        while (str[i - 1] != '-') {
-            fprintf(fp1, "%c", str[i]);
-            i++;//copy the part after revising;
-        }
-        fclose(fp1);
-    } else if (*(pos2 + 7) == '4') {//only two bed left
-        str[pos2 - str + 7] = '3';
-        str[pos2 - str + 17] = '3';
-        FILE *fp1 = fopen("hotel.db", "w");
-        for (i = 0; i < (pos3 - str); i++)
-            fprintf(fp1, "%c", str[i]);//copy the part before
-        fprintf(fp1, "name=%s\n", (char *) guest->next->ch);
-        fprintf(fp1, "id=%s\n", (char *) guest->next->next->ch);
-        fprintf(fp1, "arrival=%s\n", time);
-        key = *(int *) guest->next->next->next->ch;
-        fprintf(fp1, "key=%d\n", key);
-        breakfast = *(int *) guest->next->next->next->next->ch;
-        fprintf(fp1, "breakfast=%d\n", breakfast);
-        nights = *(int *) guest->next->next->next->next->next->ch;
-        fprintf(fp1, "nights=%d\n", nights);
-        fprintf(fp1, "price=%d\n\n", nights * 20 + breakfast * 15);
-        i = pos3 - str;
-        while (str[i - 1] != '-') {
-            fprintf(fp1, "%c", str[i]);
-            i++;//copy the part after revising;
-        }
-        fclose(fp1);
-    } else if (*(pos2 + 7) == '5') {//only two bed left
-        str[pos2 - str + 7] = '4';
-        str[pos2 - str + 17] = '2';
-        FILE *fp1 = fopen("hotel.db", "w");
-        for (i = 0; i < (pos3 - str); i++)
-            fprintf(fp1, "%c", str[i]);//copy the part before
-        fprintf(fp1, "name=%s\n", (char *) guest->next->ch);
-        fprintf(fp1, "id=%s\n", (char *) guest->next->next->ch);
-        fprintf(fp1, "arrival=%s\n", time);
-        key = *(int *) guest->next->next->next->ch;
-        fprintf(fp1, "key=%d\n", key);
-        breakfast = *(int *) guest->next->next->next->next->ch;
-        fprintf(fp1, "breakfast=%d\n", breakfast);
-        nights = *(int *) guest->next->next->next->next->next->ch;
-        fprintf(fp1, "nights=%d\n", nights);
-        fprintf(fp1, "price=%d\n\n", nights * 20 + breakfast * 15);
-        i = pos3 - str;
-        while (str[i - 1] != '-') {
-            fprintf(fp1, "%c", str[i]);
-            i++;//copy the part after revising;
-        }
-        fclose(fp1);
-    } else if (*(pos2 + 7) == '6') {
-        str[pos2 - str + 7] = '5';
-        str[pos2 - str + 17] = '1';
-        FILE *fp1 = fopen("hotel.db", "w");
-        for (i = 0; i < (pos3 - str); i++)
-            fprintf(fp1, "%c", str[i]);//copy the part before
-        fprintf(fp1, "\nname=%s\n", (char *) guest->next->ch);
-        fprintf(fp1, "id=%s\n", (char *) guest->next->next->ch);
-        fprintf(fp1, "arrival=%s\n", time);
-        key = *(int *) guest->next->next->next->ch;
-        fprintf(fp1, "key=%d\n", key);
-        breakfast = *(int *) guest->next->next->next->next->ch;
-        fprintf(fp1, "breakfast=%d\n", breakfast);
-        nights = *(int *) guest->next->next->next->next->next->ch;
-        fprintf(fp1, "nights=%d\n", nights);
-        fprintf(fp1, "price=%d\n\n", nights * 20 + breakfast * 15);
-        i = pos3 - str;
-        while (str[i - 1] != '-') {
-            fprintf(fp1, "%c", str[i]);
-            i++;//copy the part after revising;
-        }
-        fclose(fp1);
     }
-
 }
 
 int changeBreakfastNights(char *number, char *id, int breakChange, int nightsChange) {
@@ -312,7 +157,7 @@ int changeBreakfastNights(char *number, char *id, int breakChange, int nightsCha
                 fprintf(fp1, "%c", str[i]);
             fprintf(fp1, "%d\n", breakChange);
             fprintf(fp1, "nights=%d\n", nightsChange);
-            fprintf(fp1, "price=%d\n\n", nightsChange * 60 + breakChange * 15);
+            fprintf(fp1, "price=%d\n\n", nightsChange * current_rates.single_rate + breakChange * current_rates.breakfast_rate);
             pos2 = strstr(pos, "[");//to locate next room
             i = pos2 - str;
             while (str[i - 1] != '-') {
@@ -362,7 +207,7 @@ int changeBreakfastNights(char *number, char *id, int breakChange, int nightsCha
                 fprintf(fp1, "%c", str[i]);
             fprintf(fp1, "%d\n", breakChange);
             fprintf(fp1, "nights=%d\n", nightsChange);
-            fprintf(fp1, "price=%d\n\n", nightsChange * 80 + breakChange * 15);
+            fprintf(fp1, "price=%d\n\n", nightsChange * current_rates.double_rate + breakChange * current_rates.breakfast_rate);
             pos2 = strstr(pos, "[");
             i = pos2 - str;
             while (str[i - 1] != '-') {
@@ -418,7 +263,7 @@ int changeBreakfastNights(char *number, char *id, int breakChange, int nightsCha
                 fprintf(fp1, "%c", str[i]);
             fprintf(fp1, "%d\n", breakChange);
             fprintf(fp1, "nights=%d\n", nightsChange);
-            fprintf(fp1, "price=%d\n\n", nightsChange * 100 + breakChange * 15);
+            fprintf(fp1, "price=%d\n\n", nightsChange * current_rates.family_rate + breakChange * current_rates.breakfast_rate);
             pos2 = strstr(pos, "[");
             i = pos2 - str;
             while (str[i - 1] != '-') {
@@ -435,6 +280,35 @@ int changeBreakfastNights(char *number, char *id, int breakChange, int nightsCha
         free(id3);
         free(id4);
         return -1;
+    } else if (*(pos2 + 7) == 'r') {//the type is dorm
+        char target_id[50];
+        sprintf(target_id, "id=%s\n", id);
+        char *pos3 = strstr(pos, target_id);
+        char *next_room = strstr(pos + 1, "[");
+        if (pos3 != NULL && (next_room == NULL || pos3 < next_room)) {
+            pos2 = strstr(pos3, "breakfast");
+            FILE *fp1 = fopen("hotel.db", "w");
+            for (i = 0; i < pos2 - str + 10; i++)
+                fprintf(fp1, "%c", str[i]);
+            fprintf(fp1, "%d\n", breakChange);
+            fprintf(fp1, "nights=%d\n", nightsChange);
+            fprintf(fp1, "price=%d\n\n", nightsChange * 20 + breakChange * 15);
+            char *pos4 = strstr(pos3, "price");
+            pos4 = strstr(pos4, "\n\n");
+            if (pos4 != NULL) {
+                pos4 += 2;
+                i = pos4 - str;
+                while (str[i - 1] != '-') {
+                    fprintf(fp1, "%c", str[i]);
+                    i++;
+                }
+            }
+            fclose(fp1);
+            free(id2);
+            free(id3);
+            free(id4);
+            return 0;
+        }
     }
     free(id2);
     free(id3);
@@ -444,22 +318,25 @@ int changeBreakfastNights(char *number, char *id, int breakChange, int nightsCha
 
 void checkout(int time1) {//check room by room
     //int count;
-    char *name = malloc(sizeof(char) * 45);
-    char *id = malloc(sizeof(char) * 30);//this two are long to target the situation of the family room.
-    char *pricei = malloc(sizeof(char) * 5);
-    char *room = malloc(sizeof(char) * 5);
-    char *night = malloc(sizeof(char) * 2);// give the memory to store these data.
-    char *breakfasti = malloc(sizeof(char) * 2);
-    int price;//this two variable are then stored in type int
+    char name[45];
+    char id[30];
+    char pricei[5];
+    char room[5];
+    char breakfasti[2];
+    int price;
     char str[10000];
-    char *time2 = calloc(sizeof(char), 11);
+    char time2[11];
     long i = 0;
-    FILE *fp = fopen("hotel.db", "r");
-    while (feof(fp) == 0) {//not reach the end//
-        str[i] = fgetc(fp);
-        i++;
-    }
-    fclose(fp);//It is not an efficient way to read the whole data base. But it is easiest to use:)
+    int changed = 1;
+    while (changed) {
+        changed = 0;
+        i = 0;
+        FILE *fp = fopen("hotel.db", "r");
+        while (feof(fp) == 0) {
+            str[i] = fgetc(fp);
+            i++;
+        }
+        fclose(fp);
     char *pos = strstr(str, "room");//locate a room
     while (pos != NULL) {//when successfully locate a room
         char *pos2 = strstr(pos, "vacant");
@@ -472,7 +349,10 @@ void checkout(int time1) {//check room by room
             *(room + 2) = *(pos + 7);
             *(room + 3) = *(pos + 8);
             *(room + 4) = '\0';
-            checkDorm(number, room, time1);
+            if (checkDorm(number, room, time1)) {
+                changed = 1;
+                break;
+            }
         } else if (str[pos2 + 6 - str] == 'n') {//this means single room
             if (number == '0') {
                 char *pos3 = strstr(pos2, "arrival");//locate time of arrival
@@ -532,6 +412,8 @@ void checkout(int time1) {//check room by room
                         i++;
                     }//copy the part after
                     fclose(fp1);
+                    changed = 1;
+                    break;
                 }
             }
         } else if (str[pos2 + 6 - str] == 'u') {//this means double room
@@ -618,6 +500,8 @@ void checkout(int time1) {//check room by room
                         i++;
                     }//copy the part after
                     fclose(fp1);
+                    changed = 1;
+                    break;
                 }
             }
         } else if (str[pos2 + 6 - str] == 'm') {//this means family room
@@ -722,19 +606,15 @@ void checkout(int time1) {//check room by room
                         i++;
                     }//copy the part after
                     fclose(fp1);
+                    changed = 1;
+                    break;
                 }
             }
         }
         pos = strstr(pos + 1, "room");
     }
 
-    free(time2);
-    free(id);
-    free(name);
-    free(night);
-    free(pricei);
-    free(breakfasti);
-    free(room);//free the memory we have called//
+        }
 }
 
 
@@ -809,7 +689,7 @@ void checkoutCards(char *name, char *id, char *arrival, int room, int nights, in
     printf("  +====================================================+\n\n");
 }
 
-void checkDorm(char number, char *roomNum, int time1) {// the situation when check out the dorm
+int checkDorm(char number, char *roomNum, int time1) {// the situation when check out the dorm
     FILE *fp = fopen("hotel.db", "r");
     char str[10000];
     int i = 0, price;
@@ -817,54 +697,50 @@ void checkDorm(char number, char *roomNum, int time1) {// the situation when che
         str[i] = fgetc(fp);
         i++;
     }
-    fclose(fp);//It is not an efficient way to read the whole data base. But it is easiest to use:)
+    fclose(fp);
     char *pos = strstr(str, roomNum);
-    char *posVis1;
-    char *posVis2;
-    char *posVis3;
-    char *posVis4;
-    char *posVis5;
-    char *posVis6;//to locate each visitors//
     char *pos2;
-    char *name = malloc(sizeof(char) * 45);
-    char *id = malloc(sizeof(char) * 30);//this two are long to target the situation of the family room.
-    char *pricei = malloc(sizeof(char) * 5);
-    char *breakfasti = malloc(sizeof(char) * 2);
-    char *time2 = calloc(sizeof(char), 12);
-    char *A = malloc(sizeof(char) * 2);//this memory has been returned finally;
-    if (number == '0') {//the dorm has 6 people;
-        posVis1 = strstr(pos, "name");
-        posVis2 = strstr(posVis1 + 1, "name");
-        posVis3 = strstr(posVis2 + 1, "name");
-        posVis4 = strstr(posVis3 + 1, "name");
-        posVis5 = strstr(posVis4 + 1, "name");
-        posVis6 = strstr(posVis5 + 1, "name");//locate the position of each visitors//
-        int vacant = 0;
-        char *pos3 = strstr(posVis1, "arrival");//locate time of arrival of visitors 1
-        char *pos4 = strstr(posVis1, "nights");//locate the nights
+    char name[45];
+    char id[30];
+    char pricei[5];
+    char breakfasti[2];
+    char time2[12];
+    char A[2];
+
+    int num_visitors = 6 - (number - '0');
+    char *current_pos = pos;
+    int v;
+    for (v = 0; v < num_visitors; v++) {
+        char *visitor_name_pos = strstr(current_pos + 1, "name");
+        if (visitor_name_pos == NULL || visitor_name_pos > strstr(pos + 1, "[")) {
+            break; // Sanity check, should not happen if DB is correct
+        }
+        
+        char *pos3 = strstr(visitor_name_pos, "arrival");
+        char *pos4 = strstr(visitor_name_pos, "nights");
         for (i = 0; i < 10; i++) {
             *(time2 + i) = str[pos3 - str + 8 + i];
-        }//store the time
-        *(time2 + 10) = '\0';//allocate the final place with \0//
+        }
+        *(time2 + 10) = '\0';
         *A = str[pos4 + 7 - str];
         *(A + 1) = '\0';
-        int a = atoi(A);//a is the night this visitor is going to spent
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
+        int a = atoi(A);
+        
+        if (time1 == (timeToNumber(time2) + a)) { // Checkout time matches!
             i = 0;
-            while (str[posVis1 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis1 + 5 - str + i];
+            while (str[visitor_name_pos + 5 - str + i] != '\n') {
+                *(name + i) = str[visitor_name_pos + 5 - str + i];
                 i++;
             }
-            *(name + i) = '\0';//to allocate the end of the name
-            pos2 = strstr(posVis1, "id");//locate id
+            *(name + i) = '\0';
+            pos2 = strstr(visitor_name_pos, "id");
             i = 0;
             while (str[pos2 + 3 - str + i] != '\n') {
                 *(id + i) = str[pos2 + 3 - str + i];
                 i++;
             }
             *(id + i) = '\0';
-            pos2 = strstr(posVis1, "price");// to locate price
+            pos2 = strstr(visitor_name_pos, "price");
             i = 0;
             while (str[pos2 + 6 - str + i] != '\n') {
                 *(pricei + i) = str[pos2 + 6 - str + i];
@@ -872,1291 +748,222 @@ void checkDorm(char number, char *roomNum, int time1) {// the situation when che
             }
             *(pricei + i) = '\0';
             price = atoi(pricei);
-            pos2 = strstr(posVis1, "breakfast");
+            pos2 = strstr(visitor_name_pos, "breakfast");
             i = 0;
             *breakfasti = str[pos2 + 10 - str + i];
             *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);//to read breakfast
+            int breakfast = atoi(breakfasti);
             int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price,
-                          breakfast);// have gathered all the information. to create the checkout cards
+            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
+            
             FILE *fp1 = fopen("hotel.db", "w");
             if (!fp1) {
                 printf("ERROR IN POS2");
             }
+            // Copy before room block
             for (i = 0; i < (pos - str + 6); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-
+                fprintf(fp1, "%c", str[i]);
+                
             fprintf(fp1, "type=dorm\n");
+            int vacant = (number - '0') + 1;
             fprintf(fp1, "vacant=%d\n", vacant);
-            printf("%d", vacant);
-            fprintf(fp1, "visitors=%d\n\n", 6 - vacant);
-            i = posVis2 - str;//to locate visitor 2//
+            if (vacant < 6) {
+                fprintf(fp1, "visitors=%d\n", 6 - vacant);
+            } else {
+                fprintf(fp1, "visitors=0\n\n");
+            }
+            
+            // Find start of visitors
+            char *start_of_visitors = strstr(pos, "visitors");
+            start_of_visitors = strstr(start_of_visitors, "\n") + 1;
+            
+            // Copy earlier visitors in this room
+            for (i = (start_of_visitors - str); i < (visitor_name_pos - str); i++)
+                fprintf(fp1, "%c", str[i]);
+                
+            // Skip this visitor by finding the next visitor or next room
+            char *next_visitor = strstr(visitor_name_pos + 1, "name");
+            char *next_room = strstr(visitor_name_pos + 1, "[");
+            char *skip_to;
+            if (next_visitor != NULL && (next_room == NULL || next_visitor < next_room)) {
+                skip_to = next_visitor;
+            } else {
+                skip_to = next_room;
+            }
+            
+            // If we are emptying the room completely, ensure there are no trailing chars before [
+            if (vacant == 6) {
+                 skip_to = next_room;
+            }
+            
+            // Copy the rest of the database
+            i = skip_to - str;
             while (str[i - 1] != '-') {
                 fprintf(fp1, "%c", str[i]);
                 i++;
-            }//copy after her//
+            }
             fclose(fp1);
-            number = '1';
-            checkDorm(number, roomNum, time1);
-            return;
+            return 1;
         }
-
-        pos3 = strstr(posVis2, "arrival");//locate time of arrival of visitor2//
-        pos4 = strstr(posVis2, "nights");//locate the nights
-        for (i = 0; i < 10; i++) {
-            *(time2 + i) = str[pos3 - str + 8 + i];
-        }
-        *(time2 + 10) = '\0';
-        *A = str[pos4 + 7 - str];
-        *(A + 1) = '\0';
-        a = atoi(A);
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
-            i = 0;
-            while (str[posVis2 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis2 + 5 - str + i];
-                i++;
-            }
-            *(name + i) = '\0';//the end of the name
-            pos2 = strstr(posVis2, "id");
-            i = 0;
-            while (str[pos2 + 3 - str + i] != '\n') {
-                *(id + i) = str[pos2 + 3 - str + i];
-                i++;
-            }
-            *(id + i) = '\0';
-            pos2 = strstr(posVis2, "price");
-            i = 0;
-            while (str[pos2 + 6 - str + i] != '\n') {
-                *(pricei + i) = str[pos2 + 6 - str + i];
-                i++;
-            }
-            *(pricei + i) = '\0';
-            price = atoi(pricei);
-            pos2 = strstr(posVis2, "breakfast");
-            i = 0;
-            *breakfasti = str[pos2 + 10 - str + i];
-            *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);
-            int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
-            FILE *fp1 = fopen("hotel.db", "w");
-            if (!fp1) {
-                printf("ERROR IN POS1");
-            }
-            for (i = 0; i < (pos - str + 6); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            fprintf(fp1, "type=dorm\n");
-            fprintf(fp1, "vacant=%d\n", vacant);
-            fprintf(fp1, "visitors=%d\n", 6 - vacant);
-            pos2 = strstr(pos, "visitors");
-            pos2 = strstr(pos2, "\n");
-            for (i = (pos2 - str + 1); i < (posVis2 - str); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            i = posVis3 - str;
-            while (str[i - 1] != '-') {
-                fprintf(fp1, "%c", str[i]);
-                i++;
-            }//copy the part after
-            fclose(fp1);
-            number = '1';
-            checkDorm(number, roomNum, time1);
-            return;
-        }
-        pos3 = strstr(posVis3, "arrival");//locate time of arrival of visitors//
-        pos4 = strstr(posVis3, "nights");//locate the nights
-        for (i = 0; i < 10; i++) {
-            *(time2 + i) = str[pos3 - str + 8 + i];
-        }
-        *(time2 + 10) = '\0';
-        *A = str[pos4 + 7 - str];
-        *(A + 1) = '\0';
-        a = atoi(A);
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
-            i = 0;
-            while (str[posVis3 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis3 + 5 - str + i];
-                i++;
-            }
-            *(name + i) = '\0';//the end of the name
-            pos2 = strstr(posVis3, "id");
-            i = 0;
-            while (str[pos2 + 3 - str + i] != '\n') {
-                *(id + i) = str[pos2 + 3 - str + i];
-                i++;
-            }
-            *(id + i) = '\0';
-            pos2 = strstr(posVis3, "price");
-            i = 0;
-            while (str[pos2 + 6 - str + i] != '\n') {
-                *(pricei + i) = str[pos2 + 6 - str + i];
-                i++;
-            }
-            *(pricei + i) = '\0';
-            price = atoi(pricei);
-            pos2 = strstr(posVis3, "breakfast");
-            i = 0;
-            *breakfasti = str[pos2 + 10 - str + i];
-            *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);
-
-            int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
-            FILE *fp1 = fopen("hotel.db", "w");
-            if (!fp1) {
-                printf("ERROR IN POS3");
-            }
-            for (i = 0; i < (pos - str + 6); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            fprintf(fp1, "type=dorm\n");
-            fprintf(fp1, "vacant=%d\n", vacant);
-            fprintf(fp1, "visitors=%d\n", 6 - vacant);
-            pos2 = strstr(pos, "visitors");
-            pos2 = strstr(pos2, "\n");
-            for (i = (int) (pos2 - str + 1); i < (posVis3 - str); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            i = (int) (posVis4 - str);
-            while (str[i - 1] != '-') {
-                fprintf(fp1, "%c", str[i]);
-                i++;
-            }//copy the part after
-            fclose(fp1);
-            number = '1';
-            checkDorm(number, roomNum, time1);//continue check under the new condition
-            return;
-        }
-        pos3 = strstr(posVis4, "arrival");//locate time of arrival of visitors//
-        pos4 = strstr(posVis4, "nights");//locate the nights
-        for (i = 0; i < 10; i++) {
-            *(time2 + i) = str[pos3 - str + 8 + i];
-        }
-        *(time2 + 10) = '\0';
-        *A = str[pos4 + 7 - str];
-        *(A + 1) = '\0';
-        a = atoi(A);
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
-            i = 0;
-            while (str[posVis4 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis4 + 5 - str + i];
-                i++;
-            }
-            *(name + i) = '\0';//the end of the name
-            pos2 = strstr(posVis4, "id");
-            i = 0;
-            while (str[pos2 + 3 - str + i] != '\n') {
-                *(id + i) = str[pos2 + 3 - str + i];
-                i++;
-            }
-            *(id + i) = '\0';
-            pos2 = strstr(posVis4, "price");
-            i = 0;
-            while (str[pos2 + 6 - str + i] != '\n') {
-                *(pricei + i) = str[pos2 + 6 - str + i];
-                i++;
-            }
-            *(pricei + i) = '\0';
-            price = (atoi(pricei));
-            pos2 = strstr(posVis4, "breakfast");
-            i = 0;
-            *breakfasti = str[pos2 + 10 - str + i];
-            *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);
-            int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
-            FILE *fp1 = fopen("hotel.db", "w");
-            if (!fp1) {
-                printf("ERROR IN POS4");
-            }
-            for (i = 0; i < (pos - str + 6); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            fprintf(fp1, "type=dorm\n");
-            fprintf(fp1, "vacant=%d\n", vacant);
-            fprintf(fp1, "visitors=%d\n", 6 - vacant);
-            pos2 = strstr(pos, "visitors");
-            pos2 = strstr(pos2, "\n");
-            for (i = (int) (pos2 - str + 1); i < (posVis4 - str); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            i = (int) (posVis5 - str);
-            while (str[i - 1] != '-') {
-                fprintf(fp1, "%c", str[i]);
-                i++;
-            }//copy the part after
-            fclose(fp1);
-            number = '1';
-            checkDorm(number, roomNum, time1);
-            return;
-        }
-        pos3 = strstr(posVis5, "arrival");//locate time of arrival of visitors//
-        pos4 = strstr(posVis5, "nights");//locate the nights
-        for (i = 0; i < 10; i++) {
-            *(time2 + i) = str[pos3 - str + 8 + i];
-        }
-        *(time2 + 10) = '\0';
-        *A = str[pos4 + 7 - str];
-        *(A + 1) = '\0';
-        a = atoi(A);
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
-            i = 0;
-            while (str[posVis5 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis5 + 5 - str + i];
-                i++;
-            }
-            *(name + i) = '\0';//the end of the name
-            pos2 = strstr(posVis5, "id");
-            i = 0;
-            while (str[pos2 + 3 - str + i] != '\n') {
-                *(id + i) = str[pos2 + 3 - str + i];
-                i++;
-            }
-            *(id + i) = '\0';
-            pos2 = strstr(posVis5, "price");
-            i = 0;
-            while (str[pos2 + 6 - str + i] != '\n') {
-                *(pricei + i) = str[pos2 + 6 - str + i];
-                i++;
-            }
-            *(pricei + i) = '\0';
-            price = atoi(pricei);
-            pos2 = strstr(posVis5, "breakfast");
-            i = 0;
-            *breakfasti = str[pos2 + 10 - str + i];
-            *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);
-            int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
-            FILE *fp1 = fopen("hotel.db", "w");
-            if (!fp1) {
-                printf("ERROR IN POS5");
-            }
-            for (i = 0; i < (pos - str + 6); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            fprintf(fp1, "type=dorm\n");
-            fprintf(fp1, "vacant=%d\n", vacant);
-            fprintf(fp1, "visitors=%d\n", 6 - vacant);
-            pos2 = strstr(pos, "visitors");
-            pos2 = strstr(pos2, "\n");
-            for (i = (int) (pos2 - str + 1); i < (posVis5 - str); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            i = (int) (posVis6 - str);
-            while (str[i - 1] != '-') {
-                fprintf(fp1, "%c", str[i]);
-                i++;
-            }//copy the part after
-            fclose(fp1);
-            number = '1';
-            checkDorm(number, roomNum, time1);
-            return;
-        }
-        pos3 = strstr(posVis6, "arrival");//locate time of arrival of visitors//
-        pos4 = strstr(posVis6, "nights");//locate the nights
-        for (i = 0; i < 10; i++) {
-            *(time2 + i) = str[pos3 - str + 8 + i];
-        }
-        *(time2 + 10) = '\0';
-        *A = str[pos4 + 7 - str];
-        *(A + 1) = '\0';
-        a = atoi(A);
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
-            i = 0;
-            while (str[posVis6 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis6 + 5 - str + i];
-                i++;
-            }
-            *(name + i) = '\0';//the end of the name
-            pos2 = strstr(posVis6, "id");
-            i = 0;
-            while (str[pos2 + 3 - str + i] != '\n') {
-                *(id + i) = str[pos2 + 3 - str + i];
-                i++;
-            }
-            *(id + i) = '\0';
-            pos2 = strstr(posVis6, "price");
-            i = 0;
-            while (str[pos2 + 6 - str + i] != '\n') {
-                *(pricei + i) = str[pos2 + 6 - str + i];
-                i++;
-            }
-            *(pricei + i) = '\0';
-            price = atoi(pricei);
-            pos2 = strstr(posVis6, "breakfast");
-            i = 0;
-            *breakfasti = str[pos2 + 10 - str + i];
-            *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);
-            int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
-            FILE *fp1 = fopen("hotel.db", "w");
-            if (!fp1) {
-                printf("ERROR IN POS5");
-            }
-            for (i = 0; i < (pos - str + 11); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            fprintf(fp1, "type=dorm\n");
-            fprintf(fp1, "vacant=%d\n", vacant);
-            fprintf(fp1, "visitors=%d\n", 6 - vacant);
-            pos2 = strstr(pos, "visitors");
-            pos2 = strstr(pos2, "\n");
-            for (i = (pos2 - str); i < (posVis6 - str); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            pos2 = strstr(pos2, "room");
-            i = pos2 - str;
-            while (str[i - 2] != '-') {
-                fprintf(fp1, "%c", str[i - 1]);
-                i++;
-            }//copy the part after
-            fclose(fp1);
-        }
-    } else if (number == '1') {
-        int vacant = 1;
-        posVis1 = strstr(pos, "name");
-        posVis2 = strstr(posVis1 + 1, "name");
-        posVis3 = strstr(posVis2 + 1, "name");
-        posVis4 = strstr(posVis3 + 1, "name");
-        posVis5 = strstr(posVis4 + 1, "name");
-        char *pos3 = strstr(posVis1, "arrival");//locate time of arrival of visitors 1
-        char *pos4 = strstr(posVis1, "nights");//locate the nights
-        for (i = 0; i < 10; i++) {
-            *(time2 + i) = str[pos3 - str + 8 + i];
-        }
-        *(time2 + 10) = '\0';
-        char *A = malloc(sizeof(char) * 2);
-        *A = str[pos4 + 7 - str];
-        *(A + 1) = '\0';
-        int a = atoi(A);
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
-            i = 0;
-            while (str[posVis1 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis1 + 5 - str + i];
-                i++;
-            }
-            *(name + i) = '\0';//the end of the name
-            pos2 = strstr(posVis1, "id");
-            i = 0;
-            while (str[pos2 + 3 - str + i] != '\n') {
-                *(id + i) = str[pos2 + 3 - str + i];
-                i++;
-            }
-            *(id + i) = '\0';
-            pos2 = strstr(posVis1, "price");
-            i = 0;
-            while (str[pos2 + 6 - str + i] != '\n') {
-                *(pricei + i) = str[pos2 + 6 - str + i];
-                i++;
-            }
-            *(pricei + i) = '\0';
-            price = atoi(pricei);
-            pos2 = strstr(posVis1, "breakfast");
-            i = 0;
-            *breakfasti = str[pos2 + 10 - str + i];
-            *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);
-            int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
-
-            FILE *fp1 = fopen("hotel.db", "w");
-            if (!fp1) {
-                printf("ERROR IN POS6");
-            }
-            for (i = 0; i < (pos - str + 6); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            fprintf(fp1, "type=dorm\n");
-            fprintf(fp1, "vacant=%d\n", vacant);
-            fprintf(fp1, "visitors=%d\n\n", 6 - vacant);
-            i = posVis2 - str;
-            while (str[i - 1] != '-') {
-                fprintf(fp1, "%c", str[i]);
-                printf("%c", str[i]);
-                i++;
-            }//copy the part after
-            fclose(fp1);
-            number = '2';
-            checkDorm(number, roomNum, time1);
-            return;
-        }
-
-        pos3 = strstr(posVis2, "arrival");//locate time of arrival of visitors//
-        pos4 = strstr(posVis2, "nights");//locate the nights
-        for (i = 0; i < 10; i++) {
-            *(time2 + i) = str[pos3 - str + 8 + i];
-        }
-        *(time2 + 10) = '\0';
-        *A = str[pos4 + 7 - str];
-        *(A + 1) = '\0';
-        a = atoi(A);
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
-            i = 0;
-            while (str[posVis2 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis2 + 5 - str + i];
-                i++;
-            }
-            *(name + i) = '\0';//the end of the name
-            pos2 = strstr(posVis2, "id");
-            i = 0;
-            while (str[pos2 + 3 - str + i] != '\n') {
-                *(id + i) = str[pos2 + 3 - str + i];
-                i++;
-            }
-            *(id + i) = '\0';
-            pos2 = strstr(posVis2, "price");
-            i = 0;
-            while (str[pos2 + 6 - str + i] != '\n') {
-                *(pricei + i) = str[pos2 + 6 - str + i];
-                i++;
-            }
-            *(pricei + i) = '\0';
-            price = atoi(pricei);
-            pos2 = strstr(posVis2, "breakfast");
-            i = 0;
-            *breakfasti = str[pos2 + 10 - str + i];
-            *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);
-            int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
-            FILE *fp1 = fopen("hotel.db", "w");
-            if (!fp1) {
-                printf("ERROR IN POS7");
-            }
-            for (i = 0; i < (pos - str + 6); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            fprintf(fp1, "type=dorm\n");
-            fprintf(fp1, "vacant=%d\n", vacant);
-            fprintf(fp1, "visitors=%d\n", 6 - vacant);
-            pos2 = strstr(pos, "visitors");
-            pos2 = strstr(pos2, "\n");
-            for (i = (pos2 - str + 1); i < (posVis2 - str); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            i = posVis3 - str;
-            while (str[i - 1] != '-') {
-                fprintf(fp1, "%c", str[i]);
-                i++;
-            }//copy the part after
-            fclose(fp1);
-            number = '2';
-            checkDorm(number, roomNum, time1);
-            return;
-        }
-        pos3 = strstr(posVis3, "arrival");//locate time of arrival of visitors//
-        pos4 = strstr(posVis3, "nights");//locate the nights
-        for (i = 0; i < 10; i++) {
-            *(time2 + i) = str[pos3 - str + 8 + i];
-        }
-        *(time2 + 10) = '\0';
-        *A = str[pos4 + 7 - str];
-        *(A + 1) = '\0';
-        a = atoi(A);
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
-            i = 0;
-            while (str[posVis3 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis3 + 5 - str + i];
-                i++;
-            }
-            *(name + i) = '\0';//the end of the name
-            pos2 = strstr(posVis3, "id");
-            i = 0;
-            while (str[pos2 + 3 - str + i] != '\n') {
-                *(id + i) = str[pos2 + 3 - str + i];
-                i++;
-            }
-            *(id + i) = '\0';
-            pos2 = strstr(posVis3, "price");
-            i = 0;
-            while (str[pos2 + 6 - str + i] != '\n') {
-                *(pricei + i) = str[pos2 + 6 - str + i];
-                i++;
-            }
-            *(pricei + i) = '\0';
-            price = atoi(pricei);
-            pos2 = strstr(posVis3, "breakfast");
-            i = 0;
-            *breakfasti = str[pos2 + 10 - str + i];
-            *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);
-            int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
-            FILE *fp1 = fopen("hotel.db", "w");
-            if (!fp1) {
-                printf("ERROR IN POS8");
-            }
-            for (i = 0; i < (pos - str + 6); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            fprintf(fp1, "type=dorm\n");
-            fprintf(fp1, "vacant=%d\n", vacant);
-            fprintf(fp1, "visitors=%d\n", 6 - vacant);
-            pos2 = strstr(pos, "visitors");
-            pos2 = strstr(pos2, "\n");
-            for (i = (int) (pos2 - str + 1); i < (posVis3 - str); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            i = (int) (posVis4 - str);
-            while (str[i - 1] != '-') {
-                fprintf(fp1, "%c", str[i]);
-                i++;
-            }//copy the part after
-            fclose(fp1);
-            number = '2';
-            checkDorm(number, roomNum, time1);
-            return;
-        }
-        pos3 = strstr(posVis4, "arrival");//locate time of arrival of visitors//
-        pos4 = strstr(posVis4, "nights");//locate the nights
-        for (i = 0; i < 10; i++) {
-            *(time2 + i) = str[pos3 - str + 8 + i];
-        }
-        *(time2 + 10) = '\0';
-        *A = str[pos4 + 7 - str];
-        *(A + 1) = '\0';
-        a = (int) (atoi(A));
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
-            i = 0;
-            while (str[posVis4 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis4 + 5 - str + i];
-                i++;
-            }
-            *(name + i) = '\0';//the end of the name
-            pos2 = strstr(posVis4, "id");
-            i = 0;
-            while (str[pos2 + 3 - str + i] != '\n') {
-                *(id + i) = str[pos2 + 3 - str + i];
-                i++;
-            }
-            *(id + i) = '\0';
-            pos2 = strstr(posVis4, "price");
-            i = 0;
-            while (str[pos2 + 6 - str + i] != '\n') {
-                *(pricei + i) = str[pos2 + 6 - str + i];
-                i++;
-            }
-            *(pricei + i) = '\0';
-            price = atoi(pricei);
-            pos2 = strstr(posVis4, "breakfast");
-            i = 0;
-            *breakfasti = str[pos2 + 10 - str + i];
-            *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);
-            int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
-            FILE *fp1 = fopen("hotel.db", "w");
-            if (!fp1) {
-                printf("ERROR IN POS9");
-            }
-            for (i = 0; i < (pos - str + 11); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            fprintf(fp1, "type=dorm\n");
-            fprintf(fp1, "vacant=%d\n", vacant);
-            fprintf(fp1, "visitors=%d\n", 6 - vacant);
-            pos2 = strstr(pos, "visitors");
-            pos2 = strstr(pos2, "\n");
-            for (i = (int) (pos2 - str + 1); i < (posVis4 - str); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            i = (int) (posVis5 - str);
-            while (str[i - 1] != '-') {
-                fprintf(fp1, "%c", str[i]);
-                i++;
-            }//copy the part after
-            fclose(fp1);
-            number = '2';
-            checkDorm(number, roomNum, time1);
-            return;
-        }
-        pos3 = strstr(posVis5, "arrival");//locate time of arrival of visitors//
-        pos4 = strstr(posVis5, "nights");//locate the nights
-        for (i = 0; i < 10; i++) {
-            *(time2 + i) = str[pos3 - str + 8 + i];
-        }
-        *(time2 + 10) = '\0';
-        *A = str[pos4 + 7 - str];
-        *(A + 1) = '\0';
-        a = atoi(A);
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
-            i = 0;
-            while (str[posVis5 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis5 + 5 - str + i];
-                i++;
-            }
-            *(name + i) = '\0';//the end of the name
-            pos2 = strstr(posVis5, "id");
-            i = 0;
-            while (str[pos2 + 3 - str + i] != '\n') {
-                *(id + i) = str[pos2 + 3 - str + i];
-                i++;
-            }
-            *(id + i) = '\0';
-            pos2 = strstr(posVis5, "price");
-            i = 0;
-            while (str[pos2 + 6 - str + i] != '\n') {
-                *(pricei + i) = str[pos2 + 6 - str + i];
-                i++;
-            }
-            *(pricei + i) = '\0';
-            price = atoi(pricei);
-            pos2 = strstr(posVis5, "breakfast");
-            i = 0;
-            *breakfasti = str[pos2 + 10 - str + i];
-            *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);
-            int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
-            FILE *fp1 = fopen("hotel.db", "w");
-            if (!fp1) {
-                printf("ERROR IN POS10");
-            }
-            for (i = 0; i < (pos - str + 6); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            fprintf(fp1, "type=dorm\n");
-            fprintf(fp1, "vacant=%d\n", vacant);
-            fprintf(fp1, "visitors=%d\n", 6 - vacant);
-            pos2 = strstr(pos, "visitors");
-            pos2 = strstr(pos2, "\n");
-            for (i = (pos2 - str); i < (posVis5 - str); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            pos2 = strstr(pos2, "room");
-            i = pos2 - str;
-            while (str[i - 2] != '-') {
-                fprintf(fp1, "%c", str[i - 1]);
-                i++;
-            }//copy the part after
-            fclose(fp1);
-        }
-
-    } else if (number == '2') {
-        int vacant = 2;
-        posVis1 = strstr(pos, "name");
-        posVis2 = strstr(posVis1 + 1, "name");
-        posVis3 = strstr(posVis2 + 1, "name");
-        posVis4 = strstr(posVis3 + 1, "name");
-        char *pos3 = strstr(posVis1, "arrival");//locate time of arrival of visitors 1
-        char *pos4 = strstr(posVis1, "nights");//locate the nights
-        for (i = 0; i < 10; i++) {
-            *(time2 + i) = str[pos3 - str + 8 + i];
-        }
-        *(time2 + 10) = '\0';
-        char *A = malloc(sizeof(char) * 2);
-        *A = str[pos4 + 7 - str];
-        *(A + 1) = '\0';
-        int a = atoi(A);
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
-            i = 0;
-            while (str[posVis1 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis1 + 5 - str + i];
-                i++;
-            }
-            *(name + i) = '\0';//the end of the name
-            pos2 = strstr(posVis1, "id");
-            i = 0;
-            while (str[pos2 + 3 - str + i] != '\n') {
-                *(id + i) = str[pos2 + 3 - str + i];
-                i++;
-            }
-            *(id + i) = '\0';
-            pos2 = strstr(posVis1, "price");
-            i = 0;
-            while (str[pos2 + 6 - str + i] != '\n') {
-                *(pricei + i) = str[pos2 + 6 - str + i];
-                i++;
-            }
-            *(pricei + i) = '\0';
-            price = atoi(pricei);
-            pos2 = strstr(posVis1, "breakfast");
-            i = 0;
-            *breakfasti = str[pos2 + 10 - str + i];
-            *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);
-            int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
-
-            FILE *fp1 = fopen("hotel.db", "w");
-            if (!fp1) {
-                printf("ERROR IN POS11");
-            }
-            for (i = 0; i < (pos - str + 6); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            fprintf(fp1, "type=dorm\n");
-            fprintf(fp1, "vacant=%d\n", vacant);
-            fprintf(fp1, "visitors=%d\n\n", 6 - vacant);
-            i = posVis2 - str;
-            while (str[i - 1] != '-') {
-                fprintf(fp1, "%c", str[i]);
-                i++;
-            }//copy the part after
-            fclose(fp1);
-            number = '3';
-            checkDorm(number, roomNum, time1);
-            return;
-        }
-        pos3 = strstr(posVis2, "arrival");//locate time of arrival of visitors//
-        pos4 = strstr(posVis2, "nights");//locate the nights
-        for (i = 0; i < 10; i++) {
-            *(time2 + i) = str[pos3 - str + 8 + i];
-        }
-        *(time2 + 10) = '\0';
-        *A = str[pos4 + 7 - str];
-        *(A + 1) = '\0';
-        a = atoi(A);
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
-            i = 0;
-            while (str[posVis2 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis2 + 5 - str + i];
-                i++;
-            }
-            *(name + i) = '\0';//the end of the name
-            pos2 = strstr(posVis2, "id");
-            i = 0;
-            while (str[pos2 + 3 - str + i] != '\n') {
-                *(id + i) = str[pos2 + 3 - str + i];
-                i++;
-            }
-            *(id + i) = '\0';
-            pos2 = strstr(posVis2, "price");
-            i = 0;
-            while (str[pos2 + 6 - str + i] != '\n') {
-                *(pricei + i) = str[pos2 + 6 - str + i];
-                i++;
-            }
-            *(pricei + i) = '\0';
-            price = atoi(pricei);
-            pos2 = strstr(pos, "breakfast");
-            i = 0;
-            *breakfasti = str[pos2 + 10 - str + i];
-            *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);
-            int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
-            FILE *fp1 = fopen("hotel.db", "w");
-            if (!fp1) {
-                printf("ERROR IN POS12");
-            }
-            for (i = 0; i < (pos - str + 6); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            fprintf(fp1, "type=dorm\n");
-            fprintf(fp1, "vacant=%d\n", vacant);
-            fprintf(fp1, "visitors=%d\n", 6 - vacant);
-            pos2 = strstr(pos, "visitors");
-            pos2 = strstr(pos2, "\n");
-            for (i = (pos2 - str + 1); i < (posVis2 - str); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            i = posVis3 - str;
-            while (str[i - 1] != '-') {
-                fprintf(fp1, "%c", str[i]);
-                i++;
-            }//copy the part after
-            fclose(fp1);
-            number = '3';
-            checkDorm(number, roomNum, time1);
-            return;
-        }
-        pos3 = strstr(posVis3, "arrival");//locate time of arrival of visitors//
-        pos4 = strstr(posVis3, "nights");//locate the nights
-        for (i = 0; i < 10; i++) {
-            *(time2 + i) = str[pos3 - str + 8 + i];
-        }
-        *(time2 + 10) = '\0';
-        *A = str[pos4 + 7 - str];
-        *(A + 1) = '\0';
-        a = atoi(A);
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
-            i = 0;
-            while (str[posVis3 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis3 + 5 - str + i];
-                i++;
-            }
-            *(name + i) = '\0';//the end of the name
-            pos2 = strstr(posVis3, "id");
-            i = 0;
-            while (str[pos2 + 3 - str + i] != '\n') {
-                *(id + i) = str[pos2 + 3 - str + i];
-                i++;
-            }
-            *(id + i) = '\0';
-            pos2 = strstr(posVis3, "price");
-            i = 0;
-            while (str[pos2 + 6 - str + i] != '\n') {
-                *(pricei + i) = str[pos2 + 6 - str + i];
-                i++;
-            }
-            *(pricei + i) = '\0';
-            price = atoi(pricei);
-            pos2 = strstr(posVis3, "breakfast");
-            i = 0;
-            *breakfasti = str[pos2 + 10 - str + i];
-            *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);
-            int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
-            FILE *fp1 = fopen("hotel.db", "w");
-            if (!fp1) {
-                printf("ERROR IN POS13");
-            }
-            for (i = 0; i < (pos - str + 6); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            fprintf(fp1, "type=dorm\n");
-            fprintf(fp1, "vacant=%d\n", vacant);
-            fprintf(fp1, "visitors=%d\n", 6 - vacant);
-            pos2 = strstr(pos, "visitors");
-            pos2 = strstr(pos2, "\n");
-            for (i = (pos2 - str + 1); i < (posVis3 - str); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            i = posVis4 - str;
-            while (str[i - 1] != '-') {
-                fprintf(fp1, "%c", str[i]);
-                i++;
-            }//copy the part after
-            fclose(fp1);
-            number = '3';
-            checkDorm(number, roomNum, time1);
-            return;
-        }
-        pos3 = strstr(posVis4, "arrival");//locate time of arrival of visitors//
-        pos4 = strstr(posVis4, "nights");//locate the nights
-        for (i = 0; i < 10; i++) {
-            *(time2 + i) = str[pos3 - str + 8 + i];
-        }
-        *(time2 + 10) = '\0';
-        *A = str[pos4 + 7 - str];
-        *(A + 1) = '\0';
-        a = atoi(A);
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
-            i = 0;
-            while (str[posVis4 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis4 + 5 - str + i];
-                i++;
-            }
-            *(name + i) = '\0';//the end of the name
-            pos2 = strstr(posVis4, "id");
-            i = 0;
-            while (str[pos2 + 3 - str + i] != '\n') {
-                *(id + i) = str[pos2 + 3 - str + i];
-                i++;
-            }
-            *(id + i) = '\0';
-            pos2 = strstr(posVis4, "price");
-            i = 0;
-            while (str[pos2 + 6 - str + i] != '\n') {
-                *(pricei + i) = str[pos2 + 6 - str + i];
-                i++;
-            }
-            *(pricei + i) = '\0';
-            price = atoi(pricei);
-            pos2 = strstr(posVis4, "breakfast");
-            i = 0;
-            *breakfasti = str[pos2 + 10 - str + i];
-            *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);
-            int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
-            FILE *fp1 = fopen("hotel.db", "w");
-            if (!fp1) {
-                printf("ERROR IN POS14");
-            }
-            for (i = 0; i < (pos - str + 6); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            fprintf(fp1, "type=dorm\n");
-            fprintf(fp1, "vacant=%d\n", vacant);
-            fprintf(fp1, "visitors=%d\n", 6 - vacant);
-            pos2 = strstr(pos, "visitors");
-            pos2 = strstr(pos2, "\n");
-            for (i = (pos2 - str + 1); i < (posVis4 - str); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            pos2 = strstr(pos2, "room");
-            i = pos2 - str;
-            while (str[i - 2] != '-') {
-                fprintf(fp1, "%c", str[i - 1]);
-                i++;
-            }//copy the part after
-            fclose(fp1);
-        }
-    } else if (number == '3') {
-        int vacant = 3;
-        posVis1 = strstr(pos, "name");
-        posVis2 = strstr(posVis1 + 1, "name");
-        posVis3 = strstr(posVis2 + 1, "name");
-        char *pos3 = strstr(posVis1, "arrival");//locate time of arrival of visitors 1
-        char *pos4 = strstr(posVis2, "nights");//locate the nights
-        for (i = 0; i < 10; i++) {
-            *(time2 + i) = str[pos3 - str + 8 + i];
-        }
-        *(time2 + 10) = '\0';
-        char *A = malloc(sizeof(char) * 2);
-        *A = str[pos4 + 7 - str];
-        *(A + 1) = '\0';
-        int a = atoi(A);
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
-            i = 0;
-            while (str[posVis1 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis1 + 5 - str + i];
-                i++;
-            }
-            *(name + i) = '\0';//the end of the name
-            pos2 = strstr(posVis1, "id");
-            i = 0;
-            while (str[pos2 + 3 - str + i] != '\n') {
-                *(id + i) = str[pos2 + 3 - str + i];
-                i++;
-            }
-            *(id + i) = '\0';
-            pos2 = strstr(posVis1, "price");
-            i = 0;
-            while (str[pos2 + 6 - str + i] != '\n') {
-                *(pricei + i) = str[pos2 + 6 - str + i];
-                i++;
-            }
-            *(pricei + i) = '\0';
-            price = atoi(pricei);
-            pos2 = strstr(posVis1, "breakfast");
-            i = 0;
-            *breakfasti = str[pos2 + 10 - str + i];
-            *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);
-            int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
-
-            FILE *fp1 = fopen("hotel.db", "w");
-            if (!fp1) {
-                printf("ERROR IN POS15");
-            }
-            for (i = 0; i < (pos - str + 6); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            fprintf(fp1, "type=dorm\n");
-            fprintf(fp1, "vacant=%d\n", vacant);
-            fprintf(fp1, "visitors=%d\n\n", 6 - vacant);
-            i = posVis2 - str;
-            while (str[i - 1] != '-') {
-                fprintf(fp1, "%c", str[i]);
-                i++;
-            }//copy the part after
-            fclose(fp1);
-            number = '4';
-            checkDorm(number, roomNum, time1);
-            return;
-        }
-        pos3 = strstr(posVis2, "arrival");//locate time of arrival of visitors//
-        pos4 = strstr(posVis2, "nights");//locate the nights
-        for (i = 0; i < 10; i++) {
-            *(time2 + i) = str[pos3 - str + 8 + i];
-        }
-        *(time2 + 10) = '\0';
-        *A = str[pos4 + 7 - str];
-        *(A + 1) = '\0';
-        a = atoi(A);
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
-            i = 0;
-            while (str[posVis2 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis2 + 5 - str + i];
-                i++;
-            }
-            *(name + i) = '\0';//the end of the name
-            pos2 = strstr(posVis2, "id");
-            i = 0;
-            while (str[pos2 + 3 - str + i] != '\n') {
-                *(id + i) = str[pos2 + 3 - str + i];
-                i++;
-            }
-            *(id + i) = '\0';
-            pos2 = strstr(posVis2, "price");
-            i = 0;
-            while (str[pos2 + 6 - str + i] != '\n') {
-                *(pricei + i) = str[pos2 + 6 - str + i];
-                i++;
-            }
-            *(pricei + i) = '\0';
-            price = atoi(pricei);
-            pos2 = strstr(posVis2, "breakfast");
-            i = 0;
-            *breakfasti = str[pos2 + 10 - str + i];
-            *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);
-            int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
-            FILE *fp1 = fopen("hotel.db", "w");
-            if (!fp1) {
-                printf("ERROR IN POS16");
-            }
-            for (i = 0; i < (pos - str + 6); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            fprintf(fp1, "type=dorm\n");
-            fprintf(fp1, "vacant=%d\n", vacant);
-            fprintf(fp1, "visitors=%d\n", 6 - vacant);
-            pos2 = strstr(pos, "visitors");
-            pos2 = strstr(pos2, "\n");
-            for (i = (pos2 - str + 1); i < (posVis2 - str); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            i = posVis3 - str;
-            while (str[i - 1] != '-') {
-                fprintf(fp1, "%c", str[i]);
-                i++;
-            }//copy the part after
-            fclose(fp1);
-            number = '4';
-            checkDorm(number, roomNum, time1);
-            return;
-        }
-        pos3 = strstr(posVis3, "arrival");//locate time of arrival of visitors//
-        pos4 = strstr(posVis3, "nights");//locate the nights
-        for (i = 0; i < 10; i++) {
-            *(time2 + i) = str[pos3 - str + 8 + i];
-        }
-        *(time2 + 10) = '\0';
-        *A = str[pos4 + 7 - str];
-        *(A + 1) = '\0';
-        a = atoi(A);
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
-            i = 0;
-            while (str[posVis3 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis3 + 5 - str + i];
-                i++;
-            }
-            *(name + i) = '\0';//the end of the name
-            pos2 = strstr(posVis3, "id");
-            i = 0;
-            while (str[pos2 + 3 - str + i] != '\n') {
-                *(id + i) = str[pos2 + 3 - str + i];
-                i++;
-            }
-            *(id + i) = '\0';
-            pos2 = strstr(posVis3, "price");
-            i = 0;
-            while (str[pos2 + 6 - str + i] != '\n') {
-                *(pricei + i) = str[pos2 + 6 - str + i];
-                i++;
-            }
-            *(pricei + i) = '\0';
-            price = atoi(pricei);
-            pos2 = strstr(posVis3, "breakfast");
-            i = 0;
-            *breakfasti = str[pos2 + 10 - str + i];
-            *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);
-            int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
-            FILE *fp1 = fopen("hotel.db", "w");
-            if (!fp1) {
-                printf("ERROR IN POS17");
-            }
-            for (i = 0; i < (pos - str + 6); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            fprintf(fp1, "type=dorm\n");
-            fprintf(fp1, "vacant=%d\n", vacant);
-            fprintf(fp1, "visitors=%d\n", 6 - vacant);
-            pos2 = strstr(pos, "visitors");
-            pos2 = strstr(pos2, "\n");
-            for (i = (pos2 - str + 1); i < (posVis3 - str); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            pos2 = strstr(pos2, "room");
-            i = pos2 - str;
-            while (str[i - 2] != '-') {
-                fprintf(fp1, "%c", str[i - 1]);
-                i++;
-            }//copy the part after
-            fclose(fp1);
-        }
-    } else if (number == '4') {
-        int vacant = 4;
-        posVis1 = strstr(pos, "name");
-        posVis2 = strstr(posVis1 + 1, "name");
-        char *pos3 = strstr(posVis1, "arrival");//locate time of arrival of visitors 1
-        char *pos4 = strstr(posVis1, "nights");//locate the nights
-        for (i = 0; i < 10; i++) {
-            *(time2 + i) = str[pos3 - str + 8 + i];
-        }
-        *(time2 + 10) = '\0';
-        char *A = malloc(sizeof(char) * 2);
-        *A = str[pos4 + 7 - str];
-        *(A + 1) = '\0';
-        int a = atoi(A);
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
-            i = 0;
-            while (str[posVis1 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis1 + 5 - str + i];
-                i++;
-            }
-            *(name + i) = '\0';//the end of the name
-            pos2 = strstr(posVis1, "id");
-            i = 0;
-            while (str[pos2 + 3 - str + i] != '\n') {
-                *(id + i) = str[pos2 + 3 - str + i];
-                i++;
-            }
-            *(id + i) = '\0';
-            pos2 = strstr(posVis1, "price");
-            i = 0;
-            while (str[pos2 + 6 - str + i] != '\n') {
-                *(pricei + i) = str[pos2 + 6 - str + i];
-                i++;
-            }
-            *(pricei + i) = '\0';
-            price = atoi(pricei);
-            pos2 = strstr(posVis1, "breakfast");
-            i = 0;
-            *breakfasti = str[pos2 + 10 - str + i];
-            *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);
-            int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
-
-            FILE *fp1 = fopen("hotel.db", "w");
-            if (!fp1) {
-                printf("ERROR IN POS18");
-            }
-            for (i = 0; i < (pos - str + 6); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            fprintf(fp1, "type=dorm\n");
-            fprintf(fp1, "vacant=%d\n", vacant);
-            fprintf(fp1, "visitors=%d\n\n", 6 - vacant);
-            i = posVis2 - str;
-            while (str[i - 1] != '-') {
-                fprintf(fp1, "%c", str[i]);
-                i++;
-            }//copy the part after
-            fclose(fp1);
-            number = '5';
-            checkDorm(number, roomNum, time1);
-            return;
-        }
-        pos3 = strstr(posVis2, "arrival");//locate time of arrival of visitors 1
-        pos4 = strstr(posVis2, "nights");//locate the nights
-        for (i = 0; i < 10; i++) {
-            *(time2 + i) = str[pos3 - str + 8 + i];
-        }
-        *(time2 + 10) = '\0';
-        *A = str[pos4 + 7 - str];
-        *(A + 1) = '\0';
-        a = atoi(A);
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
-            i = 0;
-            while (str[posVis2 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis2 + 5 - str + i];
-                i++;
-            }
-            *(name + i) = '\0';//the end of the name
-            pos2 = strstr(posVis2, "id");
-            i = 0;
-            while (str[pos2 + 3 - str + i] != '\n') {
-                *(id + i) = str[pos2 + 3 - str + i];
-                i++;
-            }
-            *(id + i) = '\0';
-            pos2 = strstr(posVis2, "price");
-            i = 0;
-            while (str[pos2 + 6 - str + i] != '\n') {
-                *(pricei + i) = str[pos2 + 6 - str + i];
-                i++;
-            }
-            *(pricei + i) = '\0';
-            price = atoi(pricei);
-            pos2 = strstr(posVis2, "breakfast");
-            i = 0;
-            *breakfasti = str[pos2 + 10 - str + i];
-            *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);
-            int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
-
-            FILE *fp1 = fopen("hotel.db", "w");
-            if (!fp1) {
-                printf("ERROR IN POS19");
-            }
-            for (i = 0; i < (pos - str + 6); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            fprintf(fp1, "type=dorm\n");
-            fprintf(fp1, "vacant=%d\n", vacant);
-            fprintf(fp1, "visitors=%d\n", 6 - vacant);
-            pos2 = strstr(pos, "visitors");
-            pos2 = strstr(pos2, "\n");
-            for (i = (pos2 - str + 1); i < (posVis2 - str); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            pos2 = strstr(pos2, "room");
-            i = pos2 - str;
-            while (str[i - 2] != '-') {
-                fprintf(fp1, "%c", str[i - 1]);
-                i++;
-            }//copy the part after
-            fclose(fp1);
-        }
-
-    } else if (number == '5') {
-        int vacant = 5;
-        posVis1 = strstr(pos, "name");
-        char *pos3 = strstr(posVis1, "arrival");//locate time of arrival of visitors 1
-        char *pos4 = strstr(posVis1, "nights");//locate the nights
-        for (i = 0; i < 10; i++) {
-            *(time2 + i) = str[pos3 - str + 8 + i];
-        }
-        *(time2 + 10) = '\0';
-        char *A = malloc(sizeof(char) * 2);
-        *A = str[pos4 + 7 - str];
-        *(A + 1) = '\0';
-        int a = atoi(A);
-        if (time1 == (timeToNumber(time2) + a)) {//this visitor is going to check out today.
-            vacant++;
-            i = 0;
-            while (str[posVis1 + 5 - str + i] != '\n') {
-                *(name + i) = str[posVis1 + 5 - str + i];
-                i++;
-            }
-            *(name + i) = '\0';//the end of the name
-            pos2 = strstr(posVis1, "id");
-            i = 0;
-            while (str[pos2 + 3 - str + i] != '\n') {
-                *(id + i) = str[pos2 + 3 - str + i];
-                i++;
-            }
-            *(id + i) = '\0';
-            pos2 = strstr(posVis1, "price");
-            i = 0;
-            while (str[pos2 + 6 - str + i] != '\n') {
-                *(pricei + i) = str[pos2 + 6 - str + i];
-                i++;
-            }
-            *(pricei + i) = '\0';
-            price = atoi(pricei);
-            pos2 = strstr(posVis1, "breakfast");
-            i = 0;
-            *breakfasti = str[pos2 + 10 - str + i];
-            *(breakfasti + 1) = '\0';
-            int breakfast = atoi(breakfasti);
-            int roomNumi = atoi(roomNum);
-            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
-
-            FILE *fp1 = fopen("hotel.db", "w");
-            if (!fp1) {
-                printf("ERROR IN POS20");
-            }
-            for (i = 0; i < (pos - str + 6); i++)
-                fprintf(fp1, "%c", str[i]);//copy the part before
-            fprintf(fp1, "type=dorm\n");
-            fprintf(fp1, "vacant=%d\n", vacant);
-            fprintf(fp1, "visitors=%d\n\n", 6 - vacant);
-            pos2 = strstr(pos2, "room");
-            i = pos2 - str;
-            while (str[i - 1] != '-') {
-                fprintf(fp1, "%c", str[i]);
-                i++;
-            }//copy the part after
-            fclose(fp1);
-        }
-
+        current_pos = visitor_name_pos;
     }
-    free(name);
-    free(id);
-    free(pricei);
-    free(breakfasti);
-    free(time2);
-    free(A);
+    return 0;
+}
+
+void listAvailableRooms(void) {
+    char str[10000];
+    long i = 0;
+    FILE *fp = fopen("hotel.db", "r");
+    if (!fp) return;
+    while (feof(fp) == 0) {
+        str[i] = fgetc(fp);
+        i++;
+    }
+    str[i-1] = '\0';
+    fclose(fp);
+
+    printf("\n--- AVAILABLE ROOMS ---\n");
+    char *pos = strstr(str, "[room ");
+    int count = 0;
+    while (pos != NULL) {
+        char roomNum[10] = {0};
+        strncpy(roomNum, pos + 6, 4);
+        
+        char *typePos = strstr(pos, "type=");
+        char typeStr[20] = {0};
+        if (typePos) {
+            int j = 0;
+            typePos += 5;
+            while(typePos[j] != '\n' && typePos[j] != '\0') {
+                typeStr[j] = typePos[j];
+                j++;
+            }
+        }
+        
+        char *vacantPos = strstr(pos, "vacant=");
+        if (vacantPos) {
+            int vacant = vacantPos[7] - '0';
+            if (vacant > 0) {
+                if (strstr(typeStr, "dorm") != NULL) {
+                    printf("Room %s (Dorm) - %d beds available\n", roomNum, vacant);
+                } else {
+                    printf("Room %s (%s) - Available\n", roomNum, typeStr);
+                }
+                count++;
+            }
+        }
+        pos = strstr(pos + 1, "[room ");
+    }
+    if (count == 0) printf("No rooms available.\n");
+    printf("-----------------------\n");
+}
+
+void listCheckedInGuests(void) {
+    char str[10000];
+    long i = 0;
+    FILE *fp = fopen("hotel.db", "r");
+    if (!fp) return;
+    while (feof(fp) == 0) {
+        str[i] = fgetc(fp);
+        i++;
+    }
+    str[i-1] = '\0';
+    fclose(fp);
+
+    printf("\n--- CHECKED-IN GUESTS ---\n");
+    char *pos = strstr(str, "[room ");
+    int count = 0;
+    while (pos != NULL) {
+        char *next_pos = strstr(pos + 1, "[room ");
+        char roomBlock[2000] = {0};
+        if (next_pos) {
+            strncpy(roomBlock, pos, next_pos - pos);
+        } else {
+            strcpy(roomBlock, pos);
+        }
+        
+        char roomNum[10] = {0};
+        strncpy(roomNum, pos + 6, 4);
+        
+        char *vacantPos = strstr(roomBlock, "vacant=");
+        if (vacantPos) {
+            int vacant = vacantPos[7] - '0';
+            if (strstr(roomBlock, "type=dorm")) {
+                if (vacant < 6) {
+                    printf("Room %s (Dorm): Occupied (%d beds)\n", roomNum, 6 - vacant);
+                    char *namePos = strstr(roomBlock, "name=");
+                    while(namePos) {
+                        char name[50] = {0};
+                        sscanf(namePos + 5, "%[^\n]", name);
+                        printf("  - %s\n", name);
+                        namePos = strstr(namePos + 1, "name=");
+                    }
+                    count++;
+                }
+            } else {
+                if (vacant == 0) {
+                    printf("Room %s:\n", roomNum);
+                    char *namePos1 = strstr(roomBlock, "name1=");
+                    char *namePos = strstr(roomBlock, "name=");
+                    if (namePos1) {
+                        char name[50] = {0};
+                        sscanf(namePos1 + 6, "%[^\n]", name);
+                        printf("  - %s\n", name);
+                        char *namePos2 = strstr(roomBlock, "name2=");
+                        if (namePos2) {
+                            sscanf(namePos2 + 6, "%[^\n]", name);
+                            printf("  - %s\n", name);
+                        }
+                        char *namePos3 = strstr(roomBlock, "name3=");
+                        if (namePos3) {
+                            sscanf(namePos3 + 6, "%[^\n]", name);
+                            printf("  - %s\n", name);
+                        }
+                    } else if (namePos) {
+                        char name[50] = {0};
+                        sscanf(namePos + 5, "%[^\n]", name);
+                        printf("  - %s\n", name);
+                    }
+                    count++;
+                }
+            }
+        }
+        pos = next_pos;
+    }
+    if (count == 0) printf("No guests checked in.\n");
+    printf("-------------------------\n");
+}
+
+void searchDatabase(char *query) {
+    char str[10000];
+    long i = 0;
+    FILE *fp = fopen("hotel.db", "r");
+    if (!fp) return;
+    while (feof(fp) == 0) {
+        str[i] = fgetc(fp);
+        i++;
+    }
+    str[i-1] = '\0';
+    fclose(fp);
+
+    printf("\n--- SEARCH RESULTS FOR '%s' ---\n", query);
+    char *pos = strstr(str, "[room ");
+    int count = 0;
+    while (pos != NULL) {
+        char *next_pos = strstr(pos + 1, "[room ");
+        char roomBlock[2000] = {0};
+        if (next_pos) {
+            strncpy(roomBlock, pos, next_pos - pos);
+        } else {
+            strcpy(roomBlock, pos);
+        }
+        
+        if (strstr(roomBlock, query) != NULL) {
+            printf("%s\n", roomBlock);
+            count++;
+        }
+        pos = next_pos;
+    }
+    if (count == 0) printf("No matching room or guest found.\n");
+    printf("---------------------------------\n");
 }

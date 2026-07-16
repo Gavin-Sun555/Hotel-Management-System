@@ -1,81 +1,143 @@
 #include "hotel-ll.h"
 #include "hotel-mt.h"
 #include "hotel-db.h"
+#include "hotel-config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
 int main(void) {
-    int A, i, j, f, breakfast, nights;
-    char *roomNumber = malloc(sizeof(char) * 5);
-    char *id = malloc(sizeof(char) * 9);
-    char *time1 = malloc(sizeof(char) * 20);
-    A = initialMt();
-    if (A == -1) {
-        printf("OOps,The system fails to initialize, please contact your system administer for help. :(");
-        return 0;
+    char roomNumber[10];
+    char id[30];
+    char time1[20];
+    
+    FILE *db_check = fopen("hotel.db", "r");
+    if (db_check) {
+        fclose(db_check);
+    } else {
+        printf("Database not found. Initiating first-time setup...\n");
+        int single, double_r, family, dorm;
+        printf("How many Single Rooms? "); scanf("%d", &single);
+        printf("How many Double Rooms? "); scanf("%d", &double_r);
+        printf("How many Family Rooms? "); scanf("%d", &family);
+        printf("How many Dorm Rooms? "); scanf("%d", &dorm);
+        initializeDatabase(single, double_r, family, dorm);
+        printf("- DATABASE GENERATED SUCCESSFULLY\n");
     }
-    printf("-SYSTEM INITIALIZED SUCCESSFULLY\n");
-    printf("Welcome to no-star hotel management system,press Enter to start demo");
-    getchar();
-    printf("Input the current data(the form like 04/06/1989(DATE/MONTH/YEAR)):\n");
-    scanf("%s", time1);
-    printf("Input the span of days:\n");
-    getchar();
-    int span;
-    scanf("%d", &span);
-    node_t *a;
-    srand(time(NULL));
-    for (i = 0; i < span; i++) {
-        if (i != 0) {
-            long long int b = timeToNumber(time1);//my method to dell with time is not sufficient with type int;
-            b++;
-            time1 = numberToTime(b);
-            printf("Today is %s, Following is checking out lists:\n", time1);
-            getchar();
-            checkout((int) b);
+    
+    // Get current real date
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    sprintf(time1, "%02d/%02d/%04d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
+
+    printf("========================================================\n");
+    printf("        NO-STAR HOTEL INTERACTIVE MANAGEMENT SYSTEM     \n");
+    printf("========================================================\n");
+    printf("- SYSTEM INITIALIZED SUCCESSFULLY\n");
+    printf("- CURRENT DATE: %s\n", time1);
+    
+    // Auto checkout for current date
+    long long int currentDateNum = timeToNumber(time1);
+    loadRates();
+    checkout((int)currentDateNum);
+    
+    int choice = -1;
+    while (choice != 0) {
+        printf("\n--- Main Menu ---\n");
+        printf("1. Check-In Guest(s)\n");
+        printf("2. Check-Out Guest(s) (Force manual check-out / re-run daily check-outs)\n");
+        printf("3. Modify Reservation (Change Breakfasts/Nights)\n");
+        printf("4. Adjust Room Rates\n");
+        printf("5. View Available Rooms\n");
+        printf("6. View Checked-In Guests\n");
+        printf("7. Lookup Guest or Room\n");
+        printf("8. Factory Reset Database (Wipes Data)\n");
+        printf("0. Exit System\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        if (choice == 1) {
+            node_t *guest = manualInputVisitor();
+            checkin(guest, time1);
+        } 
+        else if (choice == 2) {
+            printf("\nProcessing checkouts for %s...\n", time1);
+            checkout((int)currentDateNum);
         }
-        A = rand() % 10 + 5;
-        printf("Today %d groups of visitors check in:\n", A);//5-14 visitors per day;
-        getchar();
-        for (j = 0; j < A; j++) {
-            a = generateVisitors(A + j);
-            checkin(a, time1);
-        }
-        printf("Options to search available room(NOT AVAILABLE FOR TRIAL VERSION)\n");
-        getchar();
-        printf("Options to search guests(NOT AVAILABLE DUE TO SAFETY REASON)\n");
-        getchar();
-        printf("Options to add breakfast,change nights(NOT AVAILABLE FOR DORM)press 1 to enter/ANY OTHER NUMBER TO SKIP;)\n");
-        scanf("%d", &f);
-        while (f == 1) {
-            printf("PLEASE ENTER THE ROOM NUMBER:\n");
-            getchar();
+        else if (choice == 3) {
+            int breakfast, nights;
+            printf("Enter Room Number: ");
             scanf("%s", roomNumber);
-            printf("PLEASE ENTER THE ID NUMBER:\n");
-            getchar();
+            printf("Enter Guest ID: ");
             scanf("%s", id);
-            printf("PLEASE ENTER THE AMOUNT OF BREAKFAST AFTER CHANGE :\n");
-            getchar();
+            printf("Enter new total number of Breakfasts: ");
             scanf("%d", &breakfast);
-            printf("PLEASE ENTER THE AMOUNT OF NIGHTS AFTER CHANGE :\n");
-            getchar();
+            printf("Enter new total number of Nights: ");
             scanf("%d", &nights);
+            
             if (changeBreakfastNights(roomNumber, id, breakfast, nights) == -1) {
-                printf("FAIL TO OPERATE:PLEASE DOUBLE CHECK WHETHER THE ID OF VISITORS IS CORRECT FOR THIS ROOM.\n");
-            } else
-                printf("CHANGED SUCCESSFULLY");
-            getchar();
-            printf("OPTION AGAIN;Press1/Press any number to exit:\n");
-            scanf("%d", &f);
+                printf("FAIL TO OPERATE: Room/ID mismatch or Dorm room selected.\n");
+            } else {
+                printf("RESERVATION CHANGED SUCCESSFULLY.\n");
+            }
         }
-        printf("press Enter to next day's demo:\n");
-        getchar();
+        else if (choice == 4) {
+            printf("\n--- Current Rates ---\n");
+            printf("Single Room: $%d\n", current_rates.single_rate);
+            printf("Double Room: $%d\n", current_rates.double_rate);
+            printf("Family Room: $%d\n", current_rates.family_rate);
+            printf("Dorm Room: $%d\n", current_rates.dorm_rate);
+            printf("Breakfast Add-on: $%d\n", current_rates.breakfast_rate);
+            printf("\nEnter new Single Room rate: ");
+            scanf("%d", &current_rates.single_rate);
+            printf("Enter new Double Room rate: ");
+            scanf("%d", &current_rates.double_rate);
+            printf("Enter new Family Room rate: ");
+            scanf("%d", &current_rates.family_rate);
+            printf("Enter new Dorm Room rate: ");
+            scanf("%d", &current_rates.dorm_rate);
+            printf("Enter new Breakfast Add-on rate: ");
+            scanf("%d", &current_rates.breakfast_rate);
+            saveRates();
+            printf("RATES UPDATED SUCCESSFULLY.\n");
+        }
+        else if (choice == 5) {
+            listAvailableRooms();
+        }
+        else if (choice == 6) {
+            listCheckedInGuests();
+        }
+        else if (choice == 7) {
+            char query[50];
+            printf("Enter Guest Name, ID, or Room Number to search: ");
+            scanf("%s", query);
+            searchDatabase(query);
+        }
+        else if (choice == 8) {
+            printf("WARNING: This will erase all guests and reservations.\n");
+            printf("Are you sure? (1 for Yes, 0 for No): ");
+            int confirm;
+            scanf("%d", &confirm);
+            if (confirm == 1) {
+                int single, double_r, family, dorm;
+                printf("How many Single Rooms? "); scanf("%d", &single);
+                printf("How many Double Rooms? "); scanf("%d", &double_r);
+                printf("How many Family Rooms? "); scanf("%d", &family);
+                printf("How many Dorm Rooms? "); scanf("%d", &dorm);
+                initializeDatabase(single, double_r, family, dorm);
+                printf("- DATABASE FACTORY RESET SUCCESSFULLY\n");
+            } else {
+                printf("Reset aborted.\n");
+            }
+        }
+        else if (choice == 0) {
+            printf("Exiting system...\n");
+        }
+        else {
+            printf("Invalid choice. Please try again.\n");
+        }
     }
-    free(time1);
-    free(roomNumber);
-    free(id);
-    freeList(&a);//return the memory of a//
-}//
-//set(CMAKE_C_FLAGS "-Wall -Werror")//
+    
+    return 0;
+}

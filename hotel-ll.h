@@ -14,7 +14,7 @@ typedef struct node {
 
 node_t *initList(void *ch);
 
-node_t *generateVisitors(int a);
+node_t *manualInputVisitor(void);
 
 void freeList(node_t **head);
 
