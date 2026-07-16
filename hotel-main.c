@@ -6,7 +6,7 @@
 #include <string.h>
 #include <time.h>
 
-int main() {
+int main(void) {
     int A, i, j, f, breakfast, nights;
     char *roomNumber = malloc(sizeof(char) * 5);
     char *id = malloc(sizeof(char) * 9);

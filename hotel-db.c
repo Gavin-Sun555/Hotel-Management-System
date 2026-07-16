@@ -788,19 +788,25 @@ char *numberToTime(long long int time1) {
 
 void checkoutCards(char *name, char *id, char *arrival, int room, int nights, int price,
                    int breakfast) {//if there are multiple customers,list names and ids together
-    printf("------------------------------Receipt------------------------------\n");
-    printf("Dear %s, thank you for choosing 'no-star' hotel,looking forward to meet you next time!\n", name);
-    printf("Your basic receipt:\n");
-    printf("Your id: %s\n", id);//for multiple visitors, list them with;//
-    printf("Your room number:%d\n", room);
-    printf("Your arrival: %s\n", arrival);
-    printf("You've spent %d nights here\n", nights);
-    printf("You've eaten %d breakfast here\n", breakfast);
-    printf("The total price is %d\n", price);
-    printf("PLEASE PAY YOUR BILL!!! WE SUPPORT: VISA / MasterCard / Cash\n");
-    printf("-------------------------End of the Receipt-------------------------\n");
-    printf("BOOKING HOTLINE: 54749110. You can also book from Ctrip.com or Booking.com!\n");
-    printf("Have a nice day\n\n");
+    printf("\n");
+    printf("  +====================================================+\n");
+    printf("  |           RECEIPT  ~  NO-STAR HOTEL                |\n");
+    printf("  +----------------------------------------------------+\n");
+    printf("  |  Dear %-44s|\n", name);
+    printf("  |  Thank you for staying with us!                    |\n");
+    printf("  +----------------------------------------------------+\n");
+    printf("  |  ID           : %-34s|\n", id);
+    printf("  |  Room Number  : %-34d|\n", room);
+    printf("  |  Arrival      : %-34s|\n", arrival);
+    printf("  |  Nights       : %-34d|\n", nights);
+    printf("  |  Breakfasts   : %-34d|\n", breakfast);
+    printf("  +----------------------------------------------------+\n");
+    printf("  |  TOTAL PRICE  : %-34d|\n", price);
+    printf("  +----------------------------------------------------+\n");
+    printf("  |  Payment: VISA / MasterCard / Cash                 |\n");
+    printf("  |  Hotline: 54749110 | Ctrip.com | Booking.com       |\n");
+    printf("  |  See you next time!                                |\n");
+    printf("  +====================================================+\n\n");
 }
 
 void checkDorm(char number, char *roomNum, int time1) {// the situation when check out the dorm
@@ -1373,8 +1379,8 @@ void checkDorm(char number, char *roomNum, int time1) {// the situation when che
             *breakfasti = str[pos2 + 10 - str + i];
             *(breakfasti + 1) = '\0';
             int breakfast = atoi(breakfasti);
-            int roomnum = atoi(roomnum);
-            checkoutCards(name, id, time2, roomnum, a, price, breakfast);
+            int roomNumi = atoi(roomNum);
+            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
             FILE *fp1 = fopen("hotel.db", "w");
             if (!fp1) {
                 printf("ERROR IN POS8");
@@ -1395,7 +1401,7 @@ void checkDorm(char number, char *roomNum, int time1) {// the situation when che
             }//copy the part after
             fclose(fp1);
             number = '2';
-            checkDorm(number, roomnum, time1);
+            checkDorm(number, roomNum, time1);
             return;
         }
         pos3 = strstr(posVis4, "arrival");//locate time of arrival of visitors//
@@ -1435,8 +1441,8 @@ void checkDorm(char number, char *roomNum, int time1) {// the situation when che
             *breakfasti = str[pos2 + 10 - str + i];
             *(breakfasti + 1) = '\0';
             int breakfast = atoi(breakfasti);
-            int roomnum = atoi(roomnum);
-            checkoutCards(name, id, time2, roomnum, a, price, breakfast);
+            int roomNumi = atoi(roomNum);
+            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
             FILE *fp1 = fopen("hotel.db", "w");
             if (!fp1) {
                 printf("ERROR IN POS9");
@@ -1457,7 +1463,7 @@ void checkDorm(char number, char *roomNum, int time1) {// the situation when che
             }//copy the part after
             fclose(fp1);
             number = '2';
-            checkDorm(number, roomnum, time1);
+            checkDorm(number, roomNum, time1);
             return;
         }
         pos3 = strstr(posVis5, "arrival");//locate time of arrival of visitors//
@@ -1497,8 +1503,8 @@ void checkDorm(char number, char *roomNum, int time1) {// the situation when che
             *breakfasti = str[pos2 + 10 - str + i];
             *(breakfasti + 1) = '\0';
             int breakfast = atoi(breakfasti);
-            int roomnum = atoi(roomnum);
-            checkoutCards(name, id, time2, roomnum, a, price, breakfast);
+            int roomNumi = atoi(roomNum);
+            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
             FILE *fp1 = fopen("hotel.db", "w");
             if (!fp1) {
                 printf("ERROR IN POS10");
@@ -1565,8 +1571,8 @@ void checkDorm(char number, char *roomNum, int time1) {// the situation when che
             *breakfasti = str[pos2 + 10 - str + i];
             *(breakfasti + 1) = '\0';
             int breakfast = atoi(breakfasti);
-            int roomnum = atoi(roomnum);
-            checkoutCards(name, id, time2, roomnum, a, price, breakfast);
+            int roomNumi = atoi(roomNum);
+            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
 
             FILE *fp1 = fopen("hotel.db", "w");
             if (!fp1) {
@@ -1584,7 +1590,7 @@ void checkDorm(char number, char *roomNum, int time1) {// the situation when che
             }//copy the part after
             fclose(fp1);
             number = '3';
-            checkDorm(number, roomnum, time1);
+            checkDorm(number, roomNum, time1);
             return;
         }
         pos3 = strstr(posVis2, "arrival");//locate time of arrival of visitors//
@@ -1624,8 +1630,8 @@ void checkDorm(char number, char *roomNum, int time1) {// the situation when che
             *breakfasti = str[pos2 + 10 - str + i];
             *(breakfasti + 1) = '\0';
             int breakfast = atoi(breakfasti);
-            int roomnum = atoi(roomnum);
-            checkoutCards(name, id, time2, roomnum, a, price, breakfast);
+            int roomNumi = atoi(roomNum);
+            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
             FILE *fp1 = fopen("hotel.db", "w");
             if (!fp1) {
                 printf("ERROR IN POS12");
@@ -1646,7 +1652,7 @@ void checkDorm(char number, char *roomNum, int time1) {// the situation when che
             }//copy the part after
             fclose(fp1);
             number = '3';
-            checkDorm(number, roomnum, time1);
+            checkDorm(number, roomNum, time1);
             return;
         }
         pos3 = strstr(posVis3, "arrival");//locate time of arrival of visitors//
@@ -1686,8 +1692,8 @@ void checkDorm(char number, char *roomNum, int time1) {// the situation when che
             *breakfasti = str[pos2 + 10 - str + i];
             *(breakfasti + 1) = '\0';
             int breakfast = atoi(breakfasti);
-            int roomnum = atoi(roomnum);
-            checkoutCards(name, id, time2, roomnum, a, price, breakfast);
+            int roomNumi = atoi(roomNum);
+            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
             FILE *fp1 = fopen("hotel.db", "w");
             if (!fp1) {
                 printf("ERROR IN POS13");
@@ -1708,7 +1714,7 @@ void checkDorm(char number, char *roomNum, int time1) {// the situation when che
             }//copy the part after
             fclose(fp1);
             number = '3';
-            checkDorm(number, roomnum, time1);
+            checkDorm(number, roomNum, time1);
             return;
         }
         pos3 = strstr(posVis4, "arrival");//locate time of arrival of visitors//
@@ -1748,8 +1754,8 @@ void checkDorm(char number, char *roomNum, int time1) {// the situation when che
             *breakfasti = str[pos2 + 10 - str + i];
             *(breakfasti + 1) = '\0';
             int breakfast = atoi(breakfasti);
-            int roomnum = atoi(roomnum);
-            checkoutCards(name, id, time2, roomnum, a, price, breakfast);
+            int roomNumi = atoi(roomNum);
+            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
             FILE *fp1 = fopen("hotel.db", "w");
             if (!fp1) {
                 printf("ERROR IN POS14");
@@ -1814,8 +1820,8 @@ void checkDorm(char number, char *roomNum, int time1) {// the situation when che
             *breakfasti = str[pos2 + 10 - str + i];
             *(breakfasti + 1) = '\0';
             int breakfast = atoi(breakfasti);
-            int roomnum = atoi(roomnum);
-            checkoutCards(name, id, time2, roomnum, a, price, breakfast);
+            int roomNumi = atoi(roomNum);
+            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
 
             FILE *fp1 = fopen("hotel.db", "w");
             if (!fp1) {
@@ -1833,7 +1839,7 @@ void checkDorm(char number, char *roomNum, int time1) {// the situation when che
             }//copy the part after
             fclose(fp1);
             number = '4';
-            checkDorm(number, roomnum, time1);
+            checkDorm(number, roomNum, time1);
             return;
         }
         pos3 = strstr(posVis2, "arrival");//locate time of arrival of visitors//
@@ -1873,8 +1879,8 @@ void checkDorm(char number, char *roomNum, int time1) {// the situation when che
             *breakfasti = str[pos2 + 10 - str + i];
             *(breakfasti + 1) = '\0';
             int breakfast = atoi(breakfasti);
-            int roomnum = atoi(roomnum);
-            checkoutCards(name, id, time2, roomnum, a, price, breakfast);
+            int roomNumi = atoi(roomNum);
+            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
             FILE *fp1 = fopen("hotel.db", "w");
             if (!fp1) {
                 printf("ERROR IN POS16");
@@ -1895,7 +1901,7 @@ void checkDorm(char number, char *roomNum, int time1) {// the situation when che
             }//copy the part after
             fclose(fp1);
             number = '4';
-            checkDorm(number, roomnum, time1);
+            checkDorm(number, roomNum, time1);
             return;
         }
         pos3 = strstr(posVis3, "arrival");//locate time of arrival of visitors//
@@ -1935,8 +1941,8 @@ void checkDorm(char number, char *roomNum, int time1) {// the situation when che
             *breakfasti = str[pos2 + 10 - str + i];
             *(breakfasti + 1) = '\0';
             int breakfast = atoi(breakfasti);
-            int roomnum = atoi(roomnum);
-            checkoutCards(name, id, time2, roomnum, a, price, breakfast);
+            int roomNumi = atoi(roomNum);
+            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
             FILE *fp1 = fopen("hotel.db", "w");
             if (!fp1) {
                 printf("ERROR IN POS17");
@@ -2125,8 +2131,8 @@ void checkDorm(char number, char *roomNum, int time1) {// the situation when che
             *breakfasti = str[pos2 + 10 - str + i];
             *(breakfasti + 1) = '\0';
             int breakfast = atoi(breakfasti);
-            int roomnum = atoi(roomnum);
-            checkoutCards(name, id, time2, roomnum, a, price, breakfast);
+            int roomNumi = atoi(roomNum);
+            checkoutCards(name, id, time2, roomNumi, a, price, breakfast);
 
             FILE *fp1 = fopen("hotel.db", "w");
             if (!fp1) {

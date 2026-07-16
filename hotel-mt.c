@@ -6,7 +6,7 @@
 #include "hotel-mt.h"
 #include "hotel-db.h"
 
-int initialMt() {
+int initialMt(void) {
     FILE *fp = fopen("hotel.db", "w");
     if (fp == NULL) { return -1; }
     fprintf(fp,
@@ -134,10 +134,8 @@ void checkin(node_t *a, char *time1) {
     if (vis == 0) {
         number = searchSingle();
         if (number == NULL) {
-            printf("------------------------------WARNING------------------------------\n");
-            printf("Dear %s, We are sincerely sorry to inform you that single room is full.\n",
+            printf("\n  [!] NOTICE: Sorry %s, all single rooms are currently full.\n\n",
                    (char *) a->next->ch);//the hotel is full
-            printf("------------------------------WARNING END------------------------------\n\n");
             free(number);
             freeList(&a);
             return;
@@ -147,10 +145,8 @@ void checkin(node_t *a, char *time1) {
     } else if (vis == 1) {
         number = searchDouble();
         if (number == NULL) {
-            printf("------------------------------WARNING------------------------------\n");
-            printf("Dear %s and %s, We are sincerely sorry to inform you that double room is full.\n",
+            printf("\n  [!] NOTICE: Sorry %s and %s, all double rooms are currently full.\n\n",
                    (char *) a->next->ch, (char *) a->next->next->next->ch);//the hotel is full
-            printf("------------------------------WARNING END------------------------------\n\n");
             free(number);
             freeList(&a);
             return;
@@ -160,11 +156,9 @@ void checkin(node_t *a, char *time1) {
     } else if (vis == 2) {
         number = searchFamily();
         if (number == NULL) {
-            printf("------------------------------WARNING------------------------------\n");
-            printf("Dear %s, %s and %s, We are sincerely sorry to inform you that family room is full.\n",
+            printf("\n  [!] NOTICE: Sorry %s, %s and %s, all family rooms are currently full.\n\n",
                    (char *) a->next->ch, (char *) a->next->next->next->ch,
                    (char *) a->next->next->next->next->next->ch);//the hotel is full
-            printf("------------------------------WARNING END------------------------------\n\n");
             free(number);
             freeList(&a);
             return;
@@ -174,9 +168,7 @@ void checkin(node_t *a, char *time1) {
     } else if (vis == 3) {
         number = searchDorm();
         if (number == NULL) {
-            printf("------------------------------WARNING------------------------------\n");
-            printf("The Dorm is full.\n");
-            printf("------------------------------WARNING END------------------------------\n\n");
+            printf("\n  [!] NOTICE: All dorm beds are currently full.\n\n");
             free(number);
             freeList(&a);
             return;
@@ -191,7 +183,7 @@ void checkin(node_t *a, char *time1) {
     freeList(&a);
 }
 
-char *searchSingle() {
+char *searchSingle(void) {
     char str[10000];
     char *room = calloc(sizeof(char), 5);//remember to return the memory!!!
     int i = 0;
@@ -215,7 +207,7 @@ char *searchSingle() {
     return room;
 }
 
-char *searchDouble() {
+char *searchDouble(void) {
     char str[10000];
     char *room = calloc(sizeof(char), 5);//remember to return the memory!!!
     int i = 0;
@@ -238,7 +230,7 @@ char *searchDouble() {
     return room;
 }
 
-char *searchFamily() {
+char *searchFamily(void) {
     char str[10000];
     char *room = calloc(sizeof(char), 5);
     int i = 0;
@@ -263,7 +255,7 @@ char *searchFamily() {
     return room;
 }
 
-char *searchDorm() {
+char *searchDorm(void) {
     char str[10000];
     char *room = calloc(sizeof(char), 5);//remember to return the memory!!!
     int i = 0;
@@ -288,96 +280,106 @@ char *searchDorm() {
 
 void checkinCards(char *room, node_t *guest) {
     int key, breakfast, price;
-    printf("------------------------------Checkin Cards------------------------------\n");
-    printf("WELCOME TO 'no-star hotel'\n");//The name of our hotel is called no-star hotel//
-    printf("Room Number:%s\n", room);
+    printf("\n  +====================================================+\n");
+    printf("  |          CHECK-IN CARD  ~  NO-STAR HOTEL           |\n");
+    printf("  +----------------------------------------------------+\n");
+    printf("  |  Room Number  : %-34s|\n", room);
     if ((*((int *) (guest->ch)) + 1) != 4)
-        printf("Number of people:%d\n", (*((int *) (guest->ch)) + 1));
+        printf("  |  Guests       : %-34d|\n", (*((int *) (guest->ch)) + 1));
     else
-        printf("Number of people:1\n");
+        printf("  |  Guests       : %-34d|\n", 1);
+    printf("  +----------------------------------------------------+\n");
     if (*((int *) (guest->ch)) == 0) {
         guest = guest->next;
-        printf("Your name:%s\n", (char *) guest->ch);
+        printf("  |  Name         : %-34s|\n", (char *) guest->ch);
         guest = guest->next;
-        printf("Your ID:%s\n", (char *) guest->ch);
+        printf("  |  ID           : %-34s|\n", (char *) guest->ch);
         guest = guest->next;
         key = *(int *) guest->ch;
-        printf("Your Key:%d\n", key);
+        printf("  |  Keys         : %-34d|\n", key);
         guest = guest->next;
         breakfast = *(int *) guest->ch;
-        printf("Your Breakfast:%d\n", breakfast);
+        printf("  |  Breakfasts   : %-34d|\n", breakfast);
         guest = guest->next;
-        printf("Your Nights:%d\n", *(int *) guest->ch);
+        printf("  |  Nights       : %-34d|\n", *(int *) guest->ch);
         price = *(int *) guest->ch * 60 + breakfast * 15;
-        printf("Total price:%d\n", price);
-        printf("Hope you have a nice day. If there are some problems in your room, please try to fix it by yourself first. Our staff are too busy to do that. Thanks for your understanding.\n");
-        printf("------------------------------The end of Checkin Cards------------------------------\n\n");
+        printf("  +----------------------------------------------------+\n");
+        printf("  |  TOTAL PRICE  : %-34d|\n", price);
+        printf("  +----------------------------------------------------+\n");
+        printf("  |  Enjoy your stay! Contact front desk for help.     |\n");
+        printf("  +====================================================+\n\n");
     }//single room
     else if (*((int *) (guest->ch)) == 1) {
         guest = guest->next;
-        printf("Your name1:%s\n", (char *) guest->ch);
+        printf("  |  Name 1       : %-34s|\n", (char *) guest->ch);
         guest = guest->next;
-        printf("Your ID1:%s\n", (char *) guest->ch);
+        printf("  |  ID 1         : %-34s|\n", (char *) guest->ch);
         guest = guest->next;
-        printf("Your name2:%s\n", (char *) guest->ch);
+        printf("  |  Name 2       : %-34s|\n", (char *) guest->ch);
         guest = guest->next;
-        printf("Your ID2:%s\n", (char *) guest->ch);
+        printf("  |  ID 2         : %-34s|\n", (char *) guest->ch);
         guest = guest->next;
         key = *(int *) guest->ch;
-        printf("Your Key:%d\n", key);
+        printf("  |  Keys         : %-34d|\n", key);
         guest = guest->next;
         breakfast = *(int *) guest->ch;
-        printf("Your Breakfast:%d\n", breakfast);
+        printf("  |  Breakfasts   : %-34d|\n", breakfast);
         guest = guest->next;
-        printf("Your Nights:%d\n", *(int *) guest->ch);
+        printf("  |  Nights       : %-34d|\n", *(int *) guest->ch);
         price = *(int *) guest->ch * 80 + breakfast * 15;
-        printf("Total price:%d\n\n", price);
-        printf("Hope you have a nice day. If there are some problems in your room, please try to fix it by yourself first. Our staff are too busy to do that. Thanks for your understanding.\n");
-        printf("------------------------------The end of Checkin Cards------------------------------\n\n");
+        printf("  +----------------------------------------------------+\n");
+        printf("  |  TOTAL PRICE  : %-34d|\n", price);
+        printf("  +----------------------------------------------------+\n");
+        printf("  |  Enjoy your stay! Contact front desk for help.     |\n");
+        printf("  +====================================================+\n\n");
     }//double room
     else if (*((int *) (guest->ch)) == 2) {
         guest = guest->next;
-        printf("Your name1:%s\n", (char *) guest->ch);
+        printf("  |  Name 1       : %-34s|\n", (char *) guest->ch);
         guest = guest->next;
-        printf("Your ID1:%s\n", (char *) guest->ch);
+        printf("  |  ID 1         : %-34s|\n", (char *) guest->ch);
         guest = guest->next;
-        printf("Your name2:%s\n", (char *) guest->ch);
+        printf("  |  Name 2       : %-34s|\n", (char *) guest->ch);
         guest = guest->next;
-        printf("Your ID2:%s\n", (char *) guest->ch);
+        printf("  |  ID 2         : %-34s|\n", (char *) guest->ch);
         guest = guest->next;
-        printf("Your name3:%s\n", (char *) guest->ch);
+        printf("  |  Name 3       : %-34s|\n", (char *) guest->ch);
         guest = guest->next;
-        printf("Your ID3:%s\n", (char *) guest->ch);
+        printf("  |  ID 3         : %-34s|\n", (char *) guest->ch);
         guest = guest->next;
         key = *(int *) guest->ch;
-        printf("Your Key:%d\n", key);
+        printf("  |  Keys         : %-34d|\n", key);
         guest = guest->next;
         breakfast = *(int *) guest->ch;
-        printf("Your Breakfast:%d\n", breakfast);
+        printf("  |  Breakfasts   : %-34d|\n", breakfast);
         guest = guest->next;
-        printf("Your Nights:%d\n", *(int *) guest->ch);
+        printf("  |  Nights       : %-34d|\n", *(int *) guest->ch);
         price = *(int *) guest->ch * 100 + breakfast * 15;
-        printf("Total price:%d\n\n", price);
-        printf("Hope you have a nice day. If there are some problems in your room, please try to fix it by yourself first. Our staff are too busy to do that. Thanks for your understanding.\n");
-        printf("------------------------------The end of Checkin Cards------------------------------\n\n");
+        printf("  +----------------------------------------------------+\n");
+        printf("  |  TOTAL PRICE  : %-34d|\n", price);
+        printf("  +----------------------------------------------------+\n");
+        printf("  |  Enjoy your stay! Contact front desk for help.     |\n");
+        printf("  +====================================================+\n\n");
     }//Treble room
     else if (*((int *) (guest->ch)) == 3) {
         guest = guest->next;
-        printf("Your name1:%s\n", (char *) guest->ch);
+        printf("  |  Name         : %-34s|\n", (char *) guest->ch);
         guest = guest->next;
-        printf("Your ID1:%s\n", (char *) guest->ch);
+        printf("  |  ID           : %-34s|\n", (char *) guest->ch);
         guest = guest->next;
         key = *(int *) guest->ch;
-        printf("Your Key1:%d\n", key);
+        printf("  |  Keys         : %-34d|\n", key);
         guest = guest->next;
         breakfast = *(int *) guest->ch;
-        printf("Your Breakfast1:%d\n", breakfast);
+        printf("  |  Breakfasts   : %-34d|\n", breakfast);
         guest = guest->next;
-        printf("Your Nights1:%d\n", *(int *) guest->ch);
+        printf("  |  Nights       : %-34d|\n", *(int *) guest->ch);
         price = *(int *) guest->ch * 20 + breakfast * 15;
-        printf("Total price1:%d\n\n", price);
-        printf("Hope you have a nice day. If there are some problems in your room, please try to fix it by yourself first. Our staff are too busy to do that. Thanks for your understanding.\n");
-        printf("------------------------------The end of Checkin Cards------------------------------\n\n");
+        printf("  +----------------------------------------------------+\n");
+        printf("  |  TOTAL PRICE  : %-34d|\n", price);
+        printf("  +----------------------------------------------------+\n");
+        printf("  |  Enjoy your stay! Contact front desk for help.     |\n");
+        printf("  +====================================================+\n\n");
     }//dorm
 }
 
